@@ -1,0 +1,50 @@
+[
+    {
+        "label": "Jewelery",
+        "type_id": "1"
+    },
+    {
+        "label": "Grocery",
+        "type_id": "2"
+    },
+    {
+        "label": "Outdoors",
+        "type_id": "3"
+    },
+    {
+        "label": "Sports",
+        "type_id": "4"
+    },
+    {
+        "label": "Kids",
+        "type_id": "5"
+    },
+    {
+        "label": "Computers",
+        "type_id": "6"
+    },
+    {
+        "label": "Shoes",
+        "type_id": "7"
+    },
+    {
+        "label": "Music",
+        "type_id": "8"
+    },
+    {
+        "label": "Outdoors",
+        "type_id": "9"
+    },
+    {
+        "label": "Industrial",
+        "type_id": "10"
+    },
+    {
+        "label": "Electronics",
+        "type_id": "11"
+    },
+    {
+        "label": "Baby",
+        "type_id": "12"
+    }
+]
