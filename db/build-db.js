@@ -62,8 +62,8 @@ db.serialize( () => {
     )`);
 
     //productOrders
-    productOrdersContent.forEach( (lineItemObj) => {
-db.run(`INSERT INTO productOrders VALUES (${lineItemObj.order_id}, ${lineItemObj.product_id}, null)`)
+productOrdersContent.forEach( (lineItemObj) => {
+    db.run(`INSERT INTO productOrders VALUES (${lineItemObj.order_id}, ${lineItemObj.product_id}, null)`)
     });
 //products
 productContent.forEach( (prodObj) => {
