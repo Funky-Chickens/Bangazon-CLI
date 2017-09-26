@@ -1,6 +1,6 @@
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database(__dirname+'/bangazon.sqlite');
-let {readFileSync} = require("fs");
+let { readFileSync } = require("fs");
 
 let productContent = JSON.parse(readFileSync("./db/products.json"));
 let paymentContent = JSON.parse(readFileSync("./db/paymentOptions.json"));

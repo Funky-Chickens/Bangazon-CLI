@@ -6,7 +6,7 @@
   "scripts": {
     "db:reset": "node db/build-db.js",
     "start": "node bin/bangazon",
-    "test": "mocha -R list --watch"
+    "test": "mocha -R spec --colors --watch"
   },
   "bin": {
     "bangazon": "bin/bangazon"

@@ -39,6 +39,11 @@ module.exports.promptNewCustomer = () => {
       description: 'Enter phone number (xxx-yyy-zzzz)',
       type: 'string',
       required: true
+    }, {
+      name: 'email',
+      description: 'Enter email address',
+      type: 'string',
+      required: true
     }], function(err, results) {
       if (err) return reject(err);
       resolve(results);
