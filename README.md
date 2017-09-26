@@ -33,3 +33,18 @@ You will create a series of prompts that will allow the user to create various t
 
 1. Start with writing unit tests. As a group, determine the core functionality of the application. Define classes, controllers and methods that you think you need to build. Do that before writing the implementation code for core logic. DO NOT WRITE TESTS FOR THE USER INTERFACE (menu and prompts).
 1. All classes and methods must be fully documented.
+
+Dependencies
+
+Chai As Promised 
+ "dependencies": {
+  
+    "chalk": "^1.1.3",
+    "prompt": "^1.0.0",
+    "sqlite3": "^3.1.8"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "chai-as-promised": "^7.1.1",
+    "mocha": "^3.5.3"
+  }
