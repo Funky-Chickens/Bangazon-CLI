@@ -36,9 +36,8 @@ You will create a series of prompts that will allow the user to create various t
 
 Dependencies
 
-Chai As Promised 
+Chai As Promised
  "dependencies": {
-  
     "chalk": "^1.1.3",
     "prompt": "^1.0.0",
     "sqlite3": "^3.1.8"
