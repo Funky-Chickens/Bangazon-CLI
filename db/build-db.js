@@ -67,7 +67,7 @@ db.run(`INSERT INTO productOrders VALUES (${lineItemObj.order_id}, ${lineItemObj
     });
 //products
 productContent.forEach( (prodObj) => {
-    db.run(`INSERT INTO products VALUES (null, ${prodObj.product_type_id}, ${prodObj.seller_id}, "${prodObj.name}", "${prodObj.description}", ${prodObj.quantity_avail}, ${prodObj.price})`);
+    db.run(`INSERT INTO products VALUES (null, ${prodObj.product_type_id}, ${prodObj.seller_id}, "${prodObj.proudct_name}", "${prodObj.description}", ${prodObj.quantity_avail}, ${prodObj.price})`);
 });
     userContent.forEach( (userObj) => {
         db.run(`INSERT 
