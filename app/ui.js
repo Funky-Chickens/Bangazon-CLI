@@ -106,8 +106,8 @@ let customerMenuHandler = (err, userInput) => {
     })
   } else if (userInput.choice == '6') {
     deleteProdPrompt()
-    .then( (?) => {
-      console.log('this product has been deleted', ?);
+    .then( () => {
+      console.log('this product has been deleted');
       //run function to get popularity of entered product
     })
   } else if (userInput.choice == '7') {
