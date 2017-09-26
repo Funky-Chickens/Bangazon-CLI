@@ -57,7 +57,7 @@ ________________________________________________________________________________
 
 
 //                  STATEMENT TO ADD USERS PAYMENT TO ORDER 
-//  DELETE FROM paymentOptions WHERE paymentOptions.buyer__id = ${id}
+//  DELETE FROM paymentOptions WHERE paymentOptions.buyer_id = ${id}
 
 
 
