@@ -3,7 +3,7 @@ const { assert: {eventually, equal, isFunction, isObject, isEqual, deepEqual} } 
 const { getOneUser } = require('../app/models/Customer.js');
 // const chaiAsPromised = require('chai-as-promised');
 
-// chai.use(chaiAsPromised);//to deal with promises for future testing 
+// chai.use(chaiAsPromised);//to deal with promises for future testing
 
 // Placed here to confirm test file runs properly
 describe('post', () => {

@@ -5,8 +5,6 @@ const path = require('path');
 const dbPath = path.resolve(__dirname, '..','..', 'db','bangazon.sqlite');
 const db = new Database(dbPath);
 
-console.log(dbPath);
-
   let getOneUser= (id) => {//call in ui.js in .then
         return new Promise( (resolve, reject) => {//select user by user id and see user name instead of user id
             db.get(`SELECT *
@@ -17,5 +15,4 @@ console.log(dbPath);
                 });
         });
     }
-
 module.exports={getOneUser};
