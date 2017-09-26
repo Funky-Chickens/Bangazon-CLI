@@ -13,6 +13,8 @@ const { promptNewCustomer } = require('./controllers/customerCtrl')
 
 const db = new Database(path.join(__dirname, '..', 'db', 'bangazon.sqlite'));
 
+let date = new Date;
+
 prompt.start();
 
 module.exports.displayWelcome = () => {
@@ -37,6 +39,7 @@ let mainMenuHandler = (err, userInput) => {
     promptNewCustomer()
     .then( (custData) => {
       console.log('customer data to save:', custData );
+      custData.start_date = date;
       //save customer to db
     });
   } else if (userInput.choice == '2'){
