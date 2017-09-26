@@ -5,8 +5,13 @@ const prompt = require('prompt');
 module.exports.promptNewCustomer = () => {
   return new Promise( (resolve, reject) => {
     prompt.get([{
-      name: 'name',
-      description: 'Enter customer name (First Last)',
+      name: 'first_name',
+      description: 'Enter customer first name',
+      type: 'string',
+      required: true
+    }, {
+      name: 'last_name',
+      description: 'Enter customer last name',
       type: 'string',
       required: true
     }, {

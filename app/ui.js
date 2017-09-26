@@ -21,6 +21,7 @@ let mainMenuHandler = (err, userInput) => {
   if(userInput = '1') {
     promptNewCustomer()
     .then( (custData) => {
+      custData.start_date
       console.log('customer data to save', custData );
       //save customer to db
     });
