@@ -3,7 +3,7 @@ ________________________________________________________________________________
 
 
 //                  STATEMENT TO GET ALL USERS WITH THEIR ID'S 
-//  SELECT user.user_id, users.first_name || ' ' || users.last_name AS "Name" FROM users
+//  SELECT users.userId, users.first_name || ' ' || users.last_name AS "Name" FROM users
 
 ___________________________________________________________________________________________________________________________________
 ***** TASK 3 *****
@@ -18,7 +18,7 @@ ________________________________________________________________________________
 
 //                  STATEMENT TO POST NEW PROUDCT INFO 
 //  INSERT INTO products VALUES (null, ${prodObj.type_id}, ${prodObj.seller_id},"${prodObj.product_name}", 
-//  "${prodObj.description}", ${prodObj.quantity_avail}, ${prodObj.price
+//  "${prodObj.description}", ${prodObj.quantity_avail}, ${prodObj.price}
 
 ___________________________________________________________________________________________________________________________________
 ***** TASK 5 *****
