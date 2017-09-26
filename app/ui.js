@@ -15,13 +15,15 @@ const db = new Database(path.join(__dirname, '..', 'db', 'bangazon.sqlite'));
 
 prompt.start();
 
+let date = new Date;
+
 let mainMenuHandler = (err, userInput) => {
   console.log("user input", userInput);
   // This could get messy quickly. Maybe a better way to parse the input?
   if(userInput = '1') {
     promptNewCustomer()
     .then( (custData) => {
-      custData.start_date
+      custData.start_date = date;
       console.log('customer data to save', custData );
       //save customer to db
     });
