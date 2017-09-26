@@ -28,9 +28,11 @@ let postUserObj = (userObj) => {
             ${userObj.postal_code}, 
             "${userObj.phone}", 
             "${userObj.email}")
-            `, (err, user)=>{
+            `, function (err, user) {
             if (err) return reject(err);
-            resolve(user);
+            console.log("user?", user);
+            console.log("this last ID??", this.lastID);
+            resolve(this.lastID);
             });
     });
 };
