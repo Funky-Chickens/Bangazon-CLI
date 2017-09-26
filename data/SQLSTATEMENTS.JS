@@ -18,7 +18,7 @@ ________________________________________________________________________________
 
 //                  STATEMENT TO POST NEW PROUDCT INFO 
 //  INSERT INTO products VALUES (null, ${prodObj.type_id}, ${prodObj.seller_id},"${prodObj.product_name}", 
-//  "${prodObj.description}", ${prodObj.quantity_avail}, ${prodObj.price}
+//  "${prodObj.description}", ${prodObj.quantity_avail}, "${prodObj.price}"
 
 ___________________________________________________________________________________________________________________________________
 ***** TASK 5 *****
