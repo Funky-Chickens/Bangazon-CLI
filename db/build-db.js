@@ -134,8 +134,8 @@ function insertRows() {
             });     
         })
     }));
-}
+};
 
 functionThatCreatesTables();
 
-module.exports = { functionThatCreatesTables, insertRows }
+module.exports = { functionThatCreatesTables, insertRows };
