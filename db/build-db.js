@@ -63,82 +63,161 @@ let functionThatCreatesTables = () => {
                 type_id INTEGER PRIMARY KEY NOT NULL,
                 label TEXT NOT NULL
             )`, () => {
-                insertRows(); //When the last table is created, all tables are populated.
-                resolve(); //Resolves when tables are ready to be tested -jmr
+                Promise.all([insertUserRows(), insertProductOrderRows(), insertProductTypesRows(), insertProductRows(), insertOrderRows(), insertPaymentsRows()])
+                .then ( () => {
+                    resolve(); //Resolves when tables are ready to be tested -jmr
+                })
             });
         });
     });
 }
 
-//Populates the database -jmr
-function insertRows() {
-    Promise.all(userContent.map( ({user_id, first_name, last_name, start_date, street_address, city, state, postal_code, phone, email}) => {
-        return new Promise( (resolve, reject) => {
-            db.run(`INSERT 
-                INTO users 
-                VALUES 
-                (null, "${first_name}", 
-                "${last_name}", 
-                "${start_date}", 
-                "${street_address}", 
-                "${city}", 
-                "${state}", 
-                ${postal_code}, 
-                "${phone}", 
-                "${email}"
-            )`, function(err) {
-                if (err) return reject(err);
-                resolve(this.lastID);
-            });
-        });
-    }));
-    //productOrders -el/gm
-    Promise.all(productOrdersContent.map( ({order_id, product_id}) => {
-        return new Promise( (resolve, reject) => {
-            db.run(`INSERT INTO productOrders VALUES (${order_id}, ${product_id}, null)`, function (err) {
-                if (err) return reject (err);
-                resolve(this.lastID);
-            });
-        });
-    }));
-    //products -el/gm
-    Promise.all(productContent.map( ({product_type_id, seller_id, product_name, description, quantity_avail, price}) => {
-        return new Promise( (resolve, reject) => {
-            db.run(`INSERT INTO products VALUES (null, ${product_type_id}, ${seller_id}, "${product_name}", "${description}", ${quantity_avail}, ${price})`, function (err) {
-                if (err) return reject (err);
-                resolve(this.lastID);
-            });
-        });
-    }));
-    //product types -el/gm
-    Promise.all(productTypesContent.map( ({label}) => {
-        return new Promise( (resolve, reject) => {
-            db.run(`INSERT INTO productTypes VALUES (null, "${label}")`, function (err) {
-                if (err) return reject (err);
-                resolve(this.lastID);
-            });
-        });
-    }));
-    // payment_types -el/gm
-    Promise.all(paymentContent.map( ({buyer_id, payment_option_name, account_number}) => {
-        return new Promise( (resolve, reject) => {
-            db.run(`INSERT INTO paymentOptions VALUES (null, ${buyer_id}, '${payment_option_name}', ${account_number})`, function (err) {
-                if (err) return reject (err);
-                resolve(this.lastID);
-            });
-        });
-    }));
-    // orders -el/gm
-    Promise.all(orderContent.map( ({order_date, payment_type, buyer_id}) => {
-        return new Promise( (resolve, reject) => {
-            db.run(`INSERT INTO orders VALUES (null, "${order_date}", ${payment_type}, ${buyer_id})`, function (err) {
-                if (err) return reject (err);
-                resolve(this.lastID);
-            });     
-        });
-    }));
+//This compartmentalizes JUST the users DB functions to rebuild just that table rather than the whole database. - the ladies
+function buildUsersDB () {
+    db.serialize( () => {
+        db.run(`DROP TABLE IF EXISTS users`);
+        db.run(`CREATE TABLE IF NOT EXISTS users(
+                user_id INTEGER PRIMARY KEY NOT NULL,
+                first_name TEXT NOT NULL,
+                last_name TEXT NOT NULL,
+                start_date TEXT NOT NULL,
+                street_address TEXT NOT NULL,
+                city TEXT NOT NULL,
+                state TEXT NOT NULL,
+                postal_code INTEGER NOT NULL,
+                phone TEXT NOT NULL,
+                email TEXT NOT NULL
+            )`);
+        insertUserRows();
+    })
 }
 
-functionThatCreatesTables();
+//Populates the database -jmr
+function insertUserRows() {
+    return new Promise ( (resolve, reject) => {
+        Promise.all(userContent.map( ({user_id, first_name, last_name, start_date, street_address, city, state, postal_code, phone, email}) => {
+            return new Promise( (resolve, reject) => {
+                db.run(`INSERT 
+                    INTO users 
+                    VALUES 
+                    (null, "${first_name}", 
+                    "${last_name}", 
+                    "${start_date}", 
+                    "${street_address}", 
+                    "${city}", 
+                    "${state}", 
+                    ${postal_code}, 
+                    "${phone}", 
+                    "${email}"
+                )`, function(err) {
+                    if (err) return reject(err);
+                    resolve(this.lastID);
+                });
+            });
+        }))
+        .then( (arrayOfIds) => {
+            console.log("last IDs", arrayOfIds);
+            resolve();
+        })
+        .catch( (err) => {
+            reject(err);
+        })
+    });
+}
+    //productOrders -el/gm
+function insertProductOrderRows () {
+    return new Promise ( (resolve, reject) => {
+        Promise.all(productOrdersContent.map( ({order_id, product_id}) => {
+            return new Promise( (resolve, reject) => {
+                db.run(`INSERT INTO productOrders VALUES (${order_id}, ${product_id}, null)`, function (err) {
+                    if (err) return reject (err);
+                    resolve(this.lastID);
+                });
+            });
+        }))
+        .then( (stuff) => {
+            resolve();
+        })
+        .catch( (err) => {
+            reject(err);
+        })
+    });
+}
+    //products -el/gm
+function insertProductRows () {
+    return new Promise( (resolve, reject) => {
+        Promise.all(productContent.map( ({product_type_id, seller_id, product_name, description, quantity_avail, price}) => {
+            return new Promise( (resolve, reject) => {
+                db.run(`INSERT INTO products VALUES (null, ${product_type_id}, ${seller_id}, "${product_name}", "${description}", ${quantity_avail}, ${price})`, function (err) {
+                    if (err) return reject (err);
+                    resolve(this.lastID);
+                });
+            });
+        }))
+        .then( (stuff) => {
+            resolve();
+        })
+        .catch( (err) => {
+            reject(err);
+        })
+    })
+}
+    //product types -el/gm
+function insertProductTypesRows () {
+    return new Promise( (resolve, reject) => {
+        Promise.all(productTypesContent.map( ({label}) => {
+            return new Promise( (resolve, reject) => {
+                db.run(`INSERT INTO productTypes VALUES (null, "${label}")`, function (err) {
+                    if (err) return reject (err);
+                    resolve(this.lastID);
+                });
+            });
+        }))
+        .then( (stuff) => {
+            resolve();
+        })
+        .catch( (err) => {
+            reject(err);
+        })
+    })
+}
+    // payment_types -el/gm
+function insertPaymentsRows () {
+    return new Promise( (resolve, reject) => {
+        Promise.all(paymentContent.map( ({buyer_id, payment_option_name, account_number}) => {
+            return new Promise( (resolve, reject) => {
+                db.run(`INSERT INTO paymentOptions VALUES (null, ${buyer_id}, '${payment_option_name}', ${account_number})`, function (err) {
+                    if (err) return reject (err);
+                    resolve(this.lastID);
+                });
+            });
+        }))
+      .then( (stuff) => {
+          resolve();
+      })
+      .catch( (err) => {
+          reject(err);
+      })          
+    })
+}
+    // orders -el/gm
+function insertOrderRows () {
+    return new Promise( (resolve, reject) => {
+        Promise.all(orderContent.map( ({order_date, payment_type, buyer_id}) => {
+            return new Promise( (resolve, reject) => {
+                db.run(`INSERT INTO orders VALUES (null, "${order_date}", ${payment_type}, ${buyer_id})`, function (err) {
+                    if (err) return reject (err);
+                    resolve(this.lastID);
+                });     
+            });
+        }))
+        .then( (stuff) => {
+              resolve();
+          })
+          .catch( (err) => {
+              reject(err);
+          })  
+    })
+}
 
-module.exports = { functionThatCreatesTables, insertRows };
+module.exports = { functionThatCreatesTables, buildUsersDB };
