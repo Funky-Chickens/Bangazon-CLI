@@ -13,40 +13,305 @@ const { promptNewCustomer } = require('./controllers/customerCtrl')
 
 const db = new Database(path.join(__dirname, '..', 'db', 'bangazon.sqlite'));
 
-prompt.start();
-
 let date = new Date;
 
-let mainMenuHandler = (err, userInput) => {
-  console.log("user input", userInput);
-  // This could get messy quickly. Maybe a better way to parse the input?
-  if(userInput = '1') {
-    promptNewCustomer()
-    .then( (custData) => {
-      custData.start_date = date;
-      console.log('customer data to save', custData );
-      //save customer to db
-    });
-  }
-};
+prompt.start();
 
 module.exports.displayWelcome = () => {
   let headerDivider = `${magenta('*********************************************************')}`
-  return new Promise( (resolve, reject) => {
-    console.log(`
+  console.log(`
   ${headerDivider}
   ${magenta('**  Welcome to Bangazon! Command Line Ordering System  **')}
   ${headerDivider}
   ${magenta('1.')} Create a customer account
   ${magenta('2.')} Choose active customer
-  ${magenta('3.')} Create a payment option
-  ${magenta('4.')} Add product to shopping cart
-  ${magenta('5.')} Complete an order
-  ${magenta('6.')} See product popularity
-  ${magenta('7.')} Leave Bangazon!`);
+  ${magenta('3.')} Leave Bangazon!`);
     prompt.get([{
       name: 'choice',
       description: 'Please make a selection'
     }], mainMenuHandler );
+};
+
+let mainMenuHandler = (err, userInput) => {
+  console.log("user input", userInput);
+  // This could get messy quickly. Maybe a better way to parse the input?
+  if(userInput.choice == '1') {
+    promptNewCustomer()
+    .then( (custData) => {
+      console.log('customer data to save:', custData );
+      custData.start_date = date;
+      //save customer to db
+    });
+  } else if (userInput.choice == '2'){
+    activeCustomerPrompt()
+    .then( (activeCustomer) => {
+      console.log('this customer is now active:', activeCustomer)
+      //run active customer function that opens the customerMenuHandler
+    });
+  } else if (userInput.choice == '3') {
+    prompt.stop();
+  }
+};
+
+let printAllCustomers = () => {
+let headerDivider = `${magenta('*********************************************************')}`
+  console.log(`
+  ${headerDivider}
+  ${magenta('**  Bangazon Customer Menu! You are currently working with customer id   **')}
+  ${headerDivider}
+  ${magenta('1.')} Create a payment option
+  ${magenta('2.')} Add product to shopping cart
+  ${magenta('3.')} Complete an order
+  ${magenta('4.')} Add a product to sell
+  ${magenta('5.')} Update product information
+  ${magenta('6.')} Delete product
+  ${magenta('7.')} See product popularity
+  ${magenta('8.')} Return to the main menu
+  ${magenta('9.')} Leave Bangazon!`);
+    prompt.get([{
+      name: 'choice',
+      description: 'Please make a selection'
+    }], customerMenuHandler );
+}
+
+let customerMenuHandler = (err, userInput) => {
+  console.log("user input", userInput);
+  // This could get messy quickly. Maybe a better way to parse the input?
+  if(userInput.choice == '1') {
+    createPaymentPrompt()
+    .then( (paymentData) => {
+      console.log('payment data to save:', paymentData);
+      //run post payment function and return to menu
+    });   
+  } else if (userInput.choice == '2') {
+    addToCartPrompt()
+    .then( (cartItem) => {
+      console.log('item added to cart:', cartItem);
+      //run post item to cart function
+    })
+  } else if (userInput.choice == '3') {
+    completeOrderPrompt()
+    .then( (completeOrder) => {
+      console.log('this order is completed:', completeOrder);
+      //run post payment to order function
+    });
+  } else if (userInput.choice == '4') {
+    newProductPrompt()
+    .then( (newProduct) => {
+      console.log('this product has been added:', newProduct);
+      //run function to post new product
+    })
+  } else if (userInput.choice == '5') {
+    updateProdPrompt()
+    .then( (updatedProd) => {
+      console.log('these changes have been made to the product:', updatedProd);
+      //run function to update product information
+    })
+  } else if (userInput.choice == '6') {
+    deleteProdPrompt()
+    .then( () => {
+      console.log('this product has been deleted');
+      //run function to get popularity of entered product
+    })
+  } else if (userInput.choice == '7') {
+    productPopPrompt()
+    .then( (productPop) => {
+      console.log('the popularity for', productPop, 'is:');
+      //run function to get popularity of entered product
+    })
+  } else if (userInput.choice == '8') {
+    module.exports.displayWelcome();
+  } else if (userInput.choice == '9') {
+    prompt.stop();
+  }
+};
+
+let activeCustomerPrompt = () => {
+  return new Promise( (resolve, reject) => {
+    prompt.get([{
+      name: 'customerId',
+      description: "Enter the customer's Id",
+      type: 'string',
+      required: true
+    }], function(err, results) {
+      if (err) return reject(err);
+      resolve(results);
+    })
+  });
+};
+
+let createPaymentPrompt = () => {
+  return new Promise( (resolve, reject) => {
+    prompt.get([{
+      name: 'paymentName',
+      description: "Enter the payment option name",
+      type: 'string',
+      required: true
+    },
+    {
+      name: 'accountNum',
+      description: "Enter the account number",
+      type: 'number',
+      required: true
+    }], function(err, results) {
+      if (err) return reject(err);
+      resolve(results);
+    })
+  });
+};
+
+let addToCartPrompt = () => {
+  return new Promise( (resolve, reject) => {
+    prompt.get([{
+      name: 'productId',
+      description: "Enter the product Id",
+      type: 'number',
+      required: true
+    }], function(err, results) {
+      if (err) return reject(err);
+      resolve(results);
+    })
+  });
+};
+
+let completeOrderPrompt = () => {
+  return new Promise( (resolve, reject) => {
+    prompt.get([{
+      name: 'orderId',
+      description: "Enter the order Id",
+      type: 'number',
+      required: true
+    },
+    {
+      name: 'paymentId',
+      description: "Enter the payment Id",
+      type: 'number',
+      required: true
+    }], function(err, results) {
+      if (err) return reject(err);
+      resolve(results);
+    })
+  });
+};
+
+let newProductPrompt = () => {
+  return new Promise( (resolve, reject) => {
+    prompt.get([{
+      name: 'productName',
+      description: "Enter the product name",
+      type: 'string',
+      required: true
+    },
+    {
+      name: 'productDesc',
+      description: "Enter the product description",
+      type: 'string',
+      required: true
+    },
+    {
+      name: 'productPrice',
+      description: "Enter the product's Price",
+      type: 'string',
+      required: true
+    },
+    {
+      name: 'productDesc',
+      description: "Enter the product description",
+      type: 'string',
+      required: true
+    },
+    {
+      name: 'productTypeId',
+      description: "Enter the product type Id",
+      type: 'number',
+      required: true
+    },
+    {
+      name: 'quantityAvail',
+      description: "Enter the quantity available",
+      type: 'number',
+      required: true
+    }], function(err, results) {
+      if (err) return reject(err);
+      resolve(results);
+    })
+  });
+};
+
+let updateProdPrompt = () => {
+  return new Promise( (resolve, reject) => {
+    prompt.get([{
+      name: 'productId',
+      description: "Enter the product Id",
+      type: 'number',
+      required: true
+    },
+    {
+      name: 'productName',
+      description: "Enter the product name",
+      type: 'string',
+      required: true
+    },
+    {
+      name: 'productDesc',
+      description: "Enter the product description",
+      type: 'string',
+      required: true
+    },
+    {
+      name: 'productPrice',
+      description: "Enter the product's Price",
+      type: 'string',
+      required: true
+    },
+    {
+      name: 'productDesc',
+      description: "Enter the product description",
+      type: 'string',
+      required: true
+    },
+    {
+      name: 'productTypeId',
+      description: "Enter the product type Id",
+      type: 'number',
+      required: true
+    },
+    {
+      name: 'quantityAvail',
+      description: "Enter the quantity available",
+      type: 'number',
+      required: true
+    }], function(err, results) {
+      if (err) return reject(err);
+      resolve(results);
+    })
+  });
+};
+
+let deleteProdPrompt = () => {
+  return new Promise( (resolve, reject) => {
+    prompt.get([{
+      name: 'productId',
+      description: "Enter the product Id",
+      type: 'number',
+      required: true
+    }], function(err, results) {
+      if (err) return reject(err);
+      resolve(results);
+    })
+  });
+};
+
+let productPopPrompt = () => {
+  return new Promise( (resolve, reject) => {
+    prompt.get([{
+      name: 'productId',
+      description: "Enter the product Id",
+      type: 'number',
+      required: true
+    }], function(err, results) {
+      if (err) return reject(err);
+      resolve(results);
+    })
   });
 };
