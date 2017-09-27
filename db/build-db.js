@@ -77,7 +77,7 @@ function insertRows() {
             db.run(`INSERT 
                 INTO users 
                 VALUES 
-                (${user_id}, "${first_name}", 
+                (null, "${first_name}", 
                 "${last_name}", 
                 "${start_date}", 
                 "${street_address}", 
