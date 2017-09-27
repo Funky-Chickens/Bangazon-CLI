@@ -1,4 +1,4 @@
-use strict';
+'use strict';
 
 require('dotenv').config();
 let TIMEOUT = process.env.TIMEOUT;
@@ -30,25 +30,20 @@ describe('POST function', () => {
     email: "json@js.com"
   };
   it('should be a function', () => chai.assert.isFunction(postUserObj, "postUserObj is a function"));
-  // it('should return "lastID"', () => {
-  //   return postUserObj(testObj)
-  //   .then( (results) => {
-  //     console.log("last ID", results);
-  //     chai.assert.isNumber(results);
-  //   });
-  // });
-  it('should get the userObject that was just input', () => {
-    // console.log("test Obj", testObj);
+  it('should return "lastID"', () => {
     return postUserObj(testObj)
     .then( (results) => {
-      console.log('results of postUserObj', results)
-      return getOneUser(16)
-    })
-    .then( (oneUser) => {
-      console.log("results of getOneUser", oneUser);
-      chai.assert.eventually.equal(oneUser.last_name, 'Monahajt')
+      console.log("last ID", results);
+      chai.assert.isNumber(results);
     });
-  })
+  });
+  it('should get the userObject that was just input', () => {
+    getOneUser(1)
+      .then( (oneUser) => {
+        console.log("results of getOneUser", oneUser);
+        chai.assert.property(oneUser, 'last_name');
+      });
+    })
 });
 
 // Pro Tip: Remember, we are testing features, not functions. Require whichever modules you need to test a feature -JS

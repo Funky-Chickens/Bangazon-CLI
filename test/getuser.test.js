@@ -14,8 +14,4 @@ describe('Get Customer', () => {
     getOneUser(1)
     .then( (result) => property(result, 'last_name'));
   });
-  it('should get user id 1', () => {
-    getOneUser(1)
-    .then( (result) => equal(result.last_name, 'Bahringer'));
-  });
 });
