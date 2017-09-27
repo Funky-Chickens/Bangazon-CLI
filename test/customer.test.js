@@ -4,15 +4,17 @@ const { assert: {eventually, equal, isNumber, exists, isFunction, isObject, isEq
 const { getOneUser, postUserObj } = require('../app/models/Customer.js');
 const { functionThatCreatesTables, insertRows } = require('../db/build-db.js');
 
+//global before() drops old and creates new tables before tests begin in any file -jmr
+before( (done) => {
+  functionThatCreatesTables()
+  .then( () => done()); 
+});
+
 describe('POST function', () => {
-  before( (done) => {
-    functionThatCreatesTables() //drops old and creates new tables before tests begin -jmr
-    .then( () => done()); 
-  });
   it('should be a function', () => isFunction(postUserObj, "postUserObj is a function"));
   it('should return "lastID"', () => {
     let testObj = {
-      first_name: "Jason", 
+      first_name: "Jason",
       last_name: "Monahajt",
       start_date: new Date,
       street_address: "455 Your Mom Street",
