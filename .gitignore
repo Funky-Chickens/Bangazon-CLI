@@ -1,3 +1,4 @@
 node_modules
 db/bangazon.sqlite
 .DS_Store
+db/bangazon.sqlite-journal
