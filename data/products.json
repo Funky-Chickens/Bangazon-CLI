@@ -6,7 +6,7 @@
         "product_name": "Ergonomic Plastic Keyboard",
         "product_type_id": "3",
         "quantity_avail": "56831",
-        "seller_id": "13453"
+        "seller_id": "1"
     },
     {
         "description": "bluetooth Slovenia",
@@ -15,7 +15,7 @@
         "product_name": "Handmade Plastic Sausages",
         "product_type_id": "6",
         "quantity_avail": "48023",
-        "seller_id": "84278"
+        "seller_id": "3"
     },
     {
         "description": "Refined Human indigo",
@@ -24,7 +24,7 @@
         "product_name": "Refined Soft Pizza",
         "product_type_id": "7",
         "quantity_avail": "37029",
-        "seller_id": "20827"
+        "seller_id": "4"
     },
     {
         "description": "Dominican Republic",
@@ -33,7 +33,7 @@
         "product_name": "Handcrafted Wooden Bacon",
         "product_type_id": "8",
         "quantity_avail": "65571",
-        "seller_id": "6006"
+        "seller_id": "1"
     },
     {
         "description": "content Grove",
@@ -42,6 +42,6 @@
         "product_name": "Licensed Rubber Car",
         "product_type_id": "9",
         "quantity_avail": "88487",
-        "seller_id": "7330"
+        "seller_id": "6"
     }
 ]
