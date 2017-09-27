@@ -248,7 +248,7 @@ let productPopPrompt = () => {
 };
 
 module.exports.displayOrder = (total) => {
-  console.log('Your order total is,' total, 'Ready to purchase (Y/N)  **');
+  console.log('Your order total is', total, 'Ready to purchase (Y/N)  **');
     prompt.get([{
       name: 'choice',
       description: 'Please make a selection'
