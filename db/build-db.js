@@ -2,12 +2,12 @@ const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database(__dirname+'/bangazon.sqlite');
 let {readFileSync} = require("fs");
 
-let productContent = JSON.parse(readFileSync("./db/products.json"));
-let paymentContent = JSON.parse(readFileSync("./db/paymentOptions.json"));
-let productOrdersContent = JSON.parse(readFileSync("./db/productOrders.json"));
-let productTypesContent = JSON.parse(readFileSync("./db/productTypes.json"));
-let orderContent = JSON.parse(readFileSync("./db/orders.json"));
-let userContent = JSON.parse(readFileSync("./db/users.json"));
+let productContent = JSON.parse(readFileSync("./data/products.json"));
+let paymentContent = JSON.parse(readFileSync("./data/paymentOptions.json"));
+let productOrdersContent = JSON.parse(readFileSync("./data/productOrders.json"));
+let productTypesContent = JSON.parse(readFileSync("./data/productTypes.json"));
+let orderContent = JSON.parse(readFileSync("./data/orders.json"));
+let userContent = JSON.parse(readFileSync("./data/users.json"));
 
 db.serialize( () => {
 
@@ -62,8 +62,8 @@ db.serialize( () => {
     )`);
 
     //productOrders
-    productOrdersContent.forEach( (lineItemObj) => {
-db.run(`INSERT INTO productOrders VALUES (${lineItemObj.order_id}, ${lineItemObj.product_id}, null)`)
+productOrdersContent.forEach( (lineItemObj) => {
+    db.run(`INSERT INTO productOrders VALUES (${lineItemObj.order_id}, ${lineItemObj.product_id}, null)`)
     });
 //products
 productContent.forEach( (prodObj) => {
