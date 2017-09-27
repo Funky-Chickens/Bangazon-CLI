@@ -11,6 +11,7 @@ let productTypesContent = JSON.parse(readFileSync("./db/productTypes.json"));
 let orderContent = JSON.parse(readFileSync("./db/orders.json"));
 let userContent = JSON.parse(readFileSync("./db/users.json"));
 
+//Resets the database -jmr
 let functionThatCreatesTables = () => {
     return new Promise ( (resolve, reject) => {
         db.serialize( () => {
@@ -62,13 +63,14 @@ let functionThatCreatesTables = () => {
                 type_id INTEGER PRIMARY KEY NOT NULL,
                 label TEXT NOT NULL
             )`, () => {
-                insertRows();
-                resolve("hey")
+                insertRows(); //When the last table is created, all tables are populated.
+                resolve(); //Resolves when tables are ready to be tested -jmr
             });
         });
     });
-};
+}
 
+//Populates the database -jmr
 function insertRows() {
     Promise.all(userContent.map( ({user_id, first_name, last_name, start_date, street_address, city, state, postal_code, phone, email}) => {
         return new Promise( (resolve, reject) => {
@@ -90,7 +92,7 @@ function insertRows() {
             });
         });
     }));
-         //productOrders
+    //productOrders -el/gm
     Promise.all(productOrdersContent.map( ({order_id, product_id}) => {
         return new Promise( (resolve, reject) => {
             db.run(`INSERT INTO productOrders VALUES (${order_id}, ${product_id}, null)`, function (err) {
@@ -99,7 +101,7 @@ function insertRows() {
             });
         });
     }));
-    //products
+    //products -el/gm
     Promise.all(productContent.map( ({product_type_id, seller_id, product_name, description, quantity_avail, price}) => {
         return new Promise( (resolve, reject) => {
             db.run(`INSERT INTO products VALUES (null, ${product_type_id}, ${seller_id}, "${product_name}", "${description}", ${quantity_avail}, ${price})`, function (err) {
@@ -108,7 +110,7 @@ function insertRows() {
             });
         });
     }));
-    //product types
+    //product types -el/gm
     Promise.all(productTypesContent.map( ({label}) => {
         return new Promise( (resolve, reject) => {
             db.run(`INSERT INTO productTypes VALUES (null, "${label}")`, function (err) {
@@ -117,7 +119,7 @@ function insertRows() {
             });
         });
     }));
-    // payment_types
+    // payment_types -el/gm
     Promise.all(paymentContent.map( ({buyer_id, payment_option_name, account_number}) => {
         return new Promise( (resolve, reject) => {
             db.run(`INSERT INTO paymentOptions VALUES (null, ${buyer_id}, '${payment_option_name}', ${account_number})`, function (err) {
@@ -126,8 +128,7 @@ function insertRows() {
             });
         });
     }));
-
-    // orders
+    // orders -el/gm
     Promise.all(orderContent.map( ({order_date, payment_type, buyer_id}) => {
         return new Promise( (resolve, reject) => {
             db.run(`INSERT INTO orders VALUES (null, "${order_date}", ${payment_type}, ${buyer_id})`, function (err) {

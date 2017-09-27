@@ -7,7 +7,7 @@ const { functionThatCreatesTables } = require('../db/build-db.js');
 describe('Get Customer', () => {
   it('should be a function', () => isFunction(getOneUser, 'Function?'));
   it('should return an object', () => {
-    getOneUser(1) //call function that returns a resolved result
+    getOneUser(1) //call function that returns a resolved result -el/gm
     .then( (result) => isObject(result));
   });
   it('should get the correct user', () => {

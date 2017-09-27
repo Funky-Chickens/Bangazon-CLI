@@ -5,18 +5,19 @@ const path = require('path');
 const dbPath = path.resolve(__dirname, '..','..', 'db','bangazon.sqlite');
 const db = new Database(dbPath);
 
-let getOneUser= (id) => {//call in ui.js in .then
-    return new Promise( (resolve, reject) => {//select user by user id and see user name instead of user id
+//select user by user id and see user name instead of user id -el/gm
+let getOneUser = (id) => {//call in ui.js in .then -el/gm
+    return new Promise( (resolve, reject) => {
         db.get(`SELECT *
             FROM users
             WHERE user_id = ${id}`, (err, user) => {
                 if (err) return reject(err);
                 resolve(user);
-                reject();
-            });
+        });
     });
 };
 
+//injects the user's data -jmr
 let postUserObj = (userObj) => {
     return new Promise( (resolve, reject) => {
         db.run(`INSERT INTO users VALUES (null, 

@@ -6,12 +6,10 @@ const { functionThatCreatesTables, insertRows } = require('../db/build-db.js');
 
 describe('POST function', () => {
   before( (done) => {
-    functionThatCreatesTables()
-    .then( () => done());
+    functionThatCreatesTables() //drops old and creates new tables before tests begin -jmr
+    .then( () => done()); 
   });
-  it('should be a function', () => {
-    isFunction(postUserObj, "postUserObj is a function");
-  });
+  it('should be a function', () => isFunction(postUserObj, "postUserObj is a function"));
   it('should return "lastID"', () => {
     let testObj = {
       first_name: "Jason", 
@@ -29,4 +27,4 @@ describe('POST function', () => {
     });
 });
 
-// Pro Tip: Remember, we are testing features, not functions. Require whichever modules you need to test a feature
+// Pro Tip: Remember, we are testing features, not functions. Require whichever modules you need to test a feature -EL
