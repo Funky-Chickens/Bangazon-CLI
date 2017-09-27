@@ -2,25 +2,25 @@
 
 This ordering system allows a buyer to create an account, add payment options, add or remove products in a shopping cart, and complete an order.  Sellers can create an account, add products to sell, and update product information.
 
-##Getting Started
+## Getting Started
 
 These instructions will get the Bangazon Ordering System up and running on your local machine.
 
-###Prerequisites
+### Prerequisites
 Clone this repository to your local machine with ```git clone git@github.com:Funky-Chickens/Bangazon-CLI.git```.
 Download node.js and npm, then install the following packages from the package.json by running ```npm install``` :
 
-###Dependencies
+### Dependencies
 - chalk: version 1.1.3
 - prompt: version 1.0.0
 - sqlite3: version 3.1.8
 
-###Developer Dependencies
+### Developer Dependencies
 - chai: version 4.1.2
 - chai-as-promised: version 7.1.1
 - mocha: version 3.5.3
 
-###Starting the System
+### Starting the System
 Build the database with ```npm run db:reset```.
 Run ```npm start``` on the command line.  The main menu will appear as shown below:
 
@@ -43,7 +43,7 @@ Run ```npm start``` on the command line.  The main menu will appear as shown bel
 12. Leave Bangazon!
 >
 ```
-###Create a Customer Account Menu (#1)
+### Create a Customer Account Menu (#1)
 Buyers and sellers will be able to access this prompt to enter their account information by pressing 1:
 ```
 Enter customer name
@@ -65,7 +65,7 @@ Enter phone number
 >
 ```
 
-###Choose Active Customer Menu (#2)
+### Choose Active Customer Menu (#2)
 Buyers and sellers will be able to access the following prompt to choose the active customer by pressing 2:
 ```
 Which customer will be active?
@@ -74,7 +74,7 @@ Which customer will be active?
 >
 ```
 
-###Create a Payment Option Menu (#3)
+### Create a Payment Option Menu (#3)
 Buyers will be able to access the following prompt to add a payment option by pressing 3:
 ```
 Enter payment type (e.g. AmEx, Visa, Checking)
@@ -84,12 +84,12 @@ Enter account number
 >
 ```
 
-###Add Product to Sell Menu (#4)
+### Add Product to Sell Menu (#4)
 Sellers will be able to access the following prompt to add a product to sell by pressing 4:
 
 
 
-###Add Product to Shopping Cart Menu (#5)
+### Add Product to Shopping Cart Menu (#5)
 Buyers will be able to access the following prompt to add a product to their shopping cart by pressing 5:
 ```
 1. Diapers
@@ -99,7 +99,7 @@ Buyers will be able to access the following prompt to add a product to their sho
 ...
 9. Done adding products
 ```
-###Complete an Order Menu (#6)
+### Complete an Order Menu (#6)
 Buyers will be able to access the following prompt to complete an order by pressing 6:
 
 If no products have been selected yet:
@@ -119,7 +119,7 @@ Choose a payment option
 >
 ```
 
-###Remove Customer Product Menu (#7)
+### Remove Customer Product Menu (#7)
 Sellers will be able to access the following prompt to delete a product by pressing 7:
 ```
 Choose product to delete:
@@ -129,7 +129,7 @@ Choose product to delete:
 >
 ```
 
-###Update Product Information Menu (#8)
+### Update Product Information Menu (#8)
 Sellers will be able to access the following prompt to update the information for a product by pressing 8:
 ```
 Select a product to update:
