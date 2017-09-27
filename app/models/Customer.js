@@ -9,9 +9,10 @@ let getOneUser= (id) => {//call in ui.js in .then
     return new Promise( (resolve, reject) => {//select user by user id and see user name instead of user id
         db.get(`SELECT *
             FROM users
-            WHERE user_id = ${id}`, (err, user)=>{
-            if (err) return reject(err);
-            resolve(user);
+            WHERE user_id = ${id}`, (err, user) => {
+                if (err) return reject(err);
+                resolve(user);
+                reject();
             });
     });
 };
@@ -27,13 +28,11 @@ let postUserObj = (userObj) => {
             "${userObj.state}", 
             ${userObj.postal_code}, 
             "${userObj.phone}", 
-            "${userObj.email}")
-            `, function (err, user) {
+            "${userObj.email}"
+        )`, function (err) {
             if (err) return reject(err);
-            console.log("user?", user);
-            console.log("this last ID??", this.lastID);
             resolve(this.lastID);
-            });
+        });
     });
 };
 
