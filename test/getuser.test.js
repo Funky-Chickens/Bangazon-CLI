@@ -1,6 +1,6 @@
 'use strict';
 
-const { assert: {equal, isFunction, isObject} } = require('chai');
+const { assert: {equal, property, isFunction, isObject} } = require('chai');
 const { getOneUser, postUserObj } = require('../app/models/Customer.js');
 const { functionThatCreatesTables } = require('../db/build-db.js');
 
@@ -10,7 +10,11 @@ describe('Get Customer', () => {
     getOneUser(1) //call function that returns a resolved result -el/gm
     .then( (result) => isObject(result));
   });
-  it('should get the correct user', () => {
+  it('should get a user', () => {
+    getOneUser(1)
+    .then( (result) => property(result, 'last_name'));
+  });
+  it('should get user id 1', () => {
     getOneUser(1)
     .then( (result) => equal(result.last_name, 'Bahringer'));
   });
