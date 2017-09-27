@@ -1,10 +1,17 @@
 'use strict';
-
-const { assert: {eventually, equal, isNumber, exists, isFunction, isObject, isEqual, deepEqual} } = require('chai');
+const chai = require("chai");
+const chaiAsPromised = require("chai-as-promised");
+chai.use(chaiAsPromised);
+// const { assert: {eventually, equal, isNumber, exists, isFunction, isObject, isEqual, deepEqual} } = require('chai');
 const { getOneUser, postUserObj } = require('../app/models/Customer.js');
 const { functionThatCreatesTables, insertRows } = require('../db/build-db.js');
 
 //global before() drops old and creates new tables before tests begin in any file -jmr
+// describe('POST function', () => {
+  // before( function() {
+  //   this.timeout(10000);
+  //   return functionThatCreatesTables()
+  //   });
 before( function(done) {
   this.timeout(10000);
   functionThatCreatesTables()
@@ -23,16 +30,25 @@ describe('POST function', () => {
     phone: "555-555-5555",
     email: "json@js.com"
   };
-  it('should be a function', () => isFunction(postUserObj, "postUserObj is a function"));
+  it('should be a function', () => chai.assert.isFunction(postUserObj, "postUserObj is a function"));
   it('should return "lastID"', () => {
     postUserObj(testObj)
-      .then( (results) => isNumber(results));
+      .then( (results) => {chai.assert.isNumber(results);
+      console.log("last ID", results);
+        });
     });
-  it('should get the userObject that was just input', () => 
+  it('should get the userObject that was just input', () => {
+    console.log("test Obj", testObj);
     postUserObj(testObj)
     .then( (results) => {
-      deepEqual(getOneUser(16), testObj);
-    }))
+      console.log('results of postUserObj', results)
+    getOneUser(16)
+      .then( (oneUser) => {
+        console.log("results of getOneUser", oneUser);
+        chai.assert.equal(oneUser.last_name, 'Monahajt')
+      });
+    })
+  })
 });
 
-// Pro Tip: Remember, we are testing features, not functions. Require whichever modules you need to test a feature -EL
+// Pro Tip: Remember, we are testing features, not functions. Require whichever modules you need to test a feature -JS
