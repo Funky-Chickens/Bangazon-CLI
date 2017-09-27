@@ -1,4 +1,8 @@
-'use strict';
+use strict';
+
+require('dotenv').config();
+let TIMEOUT = process.env.TIMEOUT;
+
 const chai = require("chai");
 const chaiAsPromised = require("chai-as-promised");
 chai.use(chaiAsPromised);
@@ -7,13 +11,8 @@ const { getOneUser, postUserObj } = require('../app/models/Customer.js');
 const { functionThatCreatesTables, insertRows } = require('../db/build-db.js');
 
 //global before() drops old and creates new tables before tests begin in any file -jmr
-// describe('POST function', () => {
-  // before( function() {
-  //   this.timeout(10000);
-  //   return functionThatCreatesTables()
-  //   });
 before( function(done) {
-  this.timeout(10000);
+  this.timeout(TIMEOUT);
   functionThatCreatesTables()
   .then( () => done()); 
 });
@@ -31,23 +30,24 @@ describe('POST function', () => {
     email: "json@js.com"
   };
   it('should be a function', () => chai.assert.isFunction(postUserObj, "postUserObj is a function"));
-  it('should return "lastID"', () => {
-    postUserObj(testObj)
-      .then( (results) => {chai.assert.isNumber(results);
-      console.log("last ID", results);
-        });
-    });
+  // it('should return "lastID"', () => {
+  //   return postUserObj(testObj)
+  //   .then( (results) => {
+  //     console.log("last ID", results);
+  //     chai.assert.isNumber(results);
+  //   });
+  // });
   it('should get the userObject that was just input', () => {
-    console.log("test Obj", testObj);
-    postUserObj(testObj)
+    // console.log("test Obj", testObj);
+    return postUserObj(testObj)
     .then( (results) => {
       console.log('results of postUserObj', results)
-    getOneUser(16)
-      .then( (oneUser) => {
-        console.log("results of getOneUser", oneUser);
-        chai.assert.equal(oneUser.last_name, 'Monahajt')
-      });
+      return getOneUser(16)
     })
+    .then( (oneUser) => {
+      console.log("results of getOneUser", oneUser);
+      chai.assert.eventually.equal(oneUser.last_name, 'Monahajt')
+    });
   })
 });
 
