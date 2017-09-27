@@ -1,35 +1,32 @@
-const chai = require('chai');
-const { assert: {eventually, equal, isFunction, isObject, isEqual, deepEqual} } = require('chai');
-const { getOneUser } = require('../app/models/Customer.js');
-// const chaiAsPromised = require('chai-as-promised');
+'use strict';
 
-// chai.use(chaiAsPromised);//to deal with promises for future testing
+const { assert: {eventually, equal, isNumber, exists, isFunction, isObject, isEqual, deepEqual} } = require('chai');
+const { getOneUser, postUserObj } = require('../app/models/Customer.js');
+const { functionThatCreatesTables, insertRows } = require('../db/build-db.js');
 
-// Placed here to confirm test file runs properly
-describe('post', () => {
-  describe('Get Customer', () => {
-    it('should be a function ', () => {
-     chai.assert.isFunction(getOneUser, 'Function?');
-    });
-    it('should return an object', () => {
-      getOneUser(1) //call function that returns a resolved result
-      .then( (result) => {
-        isObject(result)
-      })
-      .catch( (err) => {
-       console.log('error', err)
-      })
-    })
-    it('should equal Bahringer',() => {
-      getOneUser(1)
-      .then( (result) => {
-        equal(result.last_name, 'Bahringer')
-      })
-      .catch( (err) => {
-        console.log( 'equal error', err)
-      })
-    })
-  });
+//global before() drops old and creates new tables before tests begin in any file -jmr
+before( (done) => {
+  functionThatCreatesTables()
+  .then( () => done()); 
 });
 
-// Pro Tip: Remember, we are testing features, not functions. Require whichever modules you need to test a feature
+describe('POST function', () => {
+  it('should be a function', () => isFunction(postUserObj, "postUserObj is a function"));
+  it('should return "lastID"', () => {
+    let testObj = {
+      first_name: "Jason",
+      last_name: "Monahajt",
+      start_date: new Date,
+      street_address: "455 Your Mom Street",
+      city: "Nashville",
+      state: "TN",
+      postal_code: 37222,
+      phone: "555-555-5555",
+      email: "json@js.com"
+    };
+    postUserObj(testObj)
+      .then( (results) => isNumber(results));
+    });
+});
+
+// Pro Tip: Remember, we are testing features, not functions. Require whichever modules you need to test a feature -EL
