@@ -45,6 +45,6 @@
         "buyer_id": "2",
         "order_date": "Thu Oct 20 2016 21:40:43 GMT-0500 (CDT)",
         "order_id": "50",
-        "payment_type": "3"
+        "payment_type": null
     }
 ]
