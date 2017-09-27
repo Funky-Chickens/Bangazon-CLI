@@ -15,7 +15,7 @@ module.exports.promptNewCustomer = () => {
       type: 'string',
       required: true
     }, {
-      name: 'street',
+      name: 'street_address',
       description: 'Enter street address',
       type: 'string',
       required: true
@@ -30,7 +30,7 @@ module.exports.promptNewCustomer = () => {
       type: 'string',
       required: true
     }, {
-      name: 'zip',
+      name: 'postal_code',
       description: 'Enter postal code',
       type: 'string',
       required: true

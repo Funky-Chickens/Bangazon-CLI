@@ -139,5 +139,6 @@ function insertRows() {
     }));
 }
 
+functionThatCreatesTables();
 
 module.exports = { functionThatCreatesTables, insertRows };

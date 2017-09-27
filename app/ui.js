@@ -10,6 +10,7 @@ prompt.message = colors.blue("Bangazon Corp");
 
 // app modules
 const { promptNewCustomer } = require('./controllers/customerCtrl')
+const { postUserObj } = require('./models/Customer')
 
 const db = new Database(path.join(__dirname, '..', 'db', 'bangazon.sqlite'));
 
@@ -38,9 +39,16 @@ let mainMenuHandler = (err, userInput) => {
   if(userInput.choice == '1') {
     promptNewCustomer()
     .then( (custData) => {
-      console.log('customer data to save:', custData );
       custData.start_date = date;
-      //save customer to db
+      console.log('customer data to save:', custData );
+      //save customer to db - cr
+      postUserObj(custData)
+      .then( (result) => {
+        console.log("the new id?", result);
+      })
+      .catch( (err) => {
+        console.log("errormagherd", err);
+      }); //-ladies
     });
   } else if (userInput.choice == '2'){
     activeCustomerPrompt()
