@@ -4,8 +4,11 @@ let activeCustomer = {
   id: null
 }
 
-module.exports.setActiveCustomer = (id) => {
+let setActiveCustomer = (id) => {
   activeCustomer.id = id;
 }
 
-module.exports.getActiveCustomer = () => activeCustomer;
+let getActiveCustomer = () => activeCustomer;
+
+
+module.exports={setActiveCustomer, getActiveCustomer};

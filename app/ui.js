@@ -9,8 +9,8 @@ const { Database } = require('sqlite3').verbose();
 prompt.message = colors.blue("Bangazon Corp");
 
 // app modules
-const { promptNewCustomer } = require('./controllers/customerCtrl')
-const { postUserObj } = require('./models/Customer')
+const { promptNewCustomer } = require('./controllers/customerCtrl');
+const { postUserObj, getAllUsers } = require('./models/Customer');
 
 const db = new Database(path.join(__dirname, '..', 'db', 'bangazon.sqlite'));
 
@@ -144,16 +144,22 @@ let customerMenuHandler = (err, userInput) => {
 
 let activeCustomerPrompt = () => {
   return new Promise( (resolve, reject) => {
-    prompt.get([{
-      name: 'customerId',
-      description: "Enter the customer's Id",
-      type: 'string',
-      required: true
-    }], function(err, results) {
-      if (err) return reject(err);
-      resolve(results);
+    getAllUsers()//GET list of all customer names and ids using customer js model
+    .then((allUsers)=>{
+      allUsers.forEach((user) => {
+        console.log(`${user.user_id}: ${user.Name}`)
+      });
+        prompt.get([{
+          name: 'customerId',
+          description: "Enter the customer's Id",
+          type: 'string',
+          required: true
+        }], function(err, results) {
+          if (err) return reject(err);
+          resolve(results);
+      })
     })
-  });
+  })
 };
 
 let createPaymentPrompt = () => {
