@@ -22,4 +22,13 @@ let getAllUserProducts = (id) => {
 
 };
 
-module.exports = { getAllUserProducts };
+let postNewProduct = (prodObj) => {
+    return new Promise( (resolve, reject) => {
+        db.run(`INSERT INTO products VALUES (null, ${prodObj.product_type_id}, ${prodObj.seller_id}, "${prodObj.product_name}", "${prodObj.description}", ${prodObj.quantity_avail}, ${prodObj.price})`, function(err) {
+                if(err) return reject(err);
+                resolve(this.lastID);
+        });
+    });
+};
+
+module.exports = { getAllUserProducts, postNewProduct };
