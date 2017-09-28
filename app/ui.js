@@ -11,6 +11,7 @@ prompt.message = colors.blue("Bangazon Corp");
 // app modules
 const { promptNewCustomer } = require('./controllers/customerCtrl');
 const { postUserObj, getAllUsers } = require('./models/Customer');
+const { getActiveCustomer, setActiveCustomer } = require('./activeCustomer');
 
 const db = new Database(path.join(__dirname, '..', 'db', 'bangazon.sqlite'));
 
@@ -54,10 +55,15 @@ let mainMenuHandler = (err, userInput) => {
   } else if (userInput.choice == '2'){
     activeCustomerPrompt()
     .then( (activeCustomer) => {
-      console.log('this customer is now active:', activeCustomer)
+      //get active customer and set active customer
+      console.log(activeCustomer.customerId)
+      setActiveCustomer(activeCustomer.customerId);
+      console.log(`Customer ${activeCustomer.customerId} is now active.`);
       //run active customer function that opens the customerMenuHandler
+      printAllCustomers();
     });
   } else if (userInput.choice == '3') {
+    console.log("Thank you for visiting Bangazon.  Goodbye.")
     prompt.stop();
   }
 };
@@ -66,7 +72,7 @@ let printAllCustomers = () => {
 let headerDivider = `${magenta('*********************************************************')}`
   console.log(`
   ${headerDivider}
-  ${magenta('**  Bangazon Customer Menu! You are currently working with customer id   **')}
+  ${magenta(`**  Bangazon Customer Menu  **`)}
   ${headerDivider}
   ${magenta('1.')} Create a payment option
   ${magenta('2.')} Add product to shopping cart
@@ -84,7 +90,8 @@ let headerDivider = `${magenta('************************************************
 }
 
 let customerMenuHandler = (err, userInput) => {
-  console.log("user input", userInput);
+  console.log(`You are currently working with customer id ${getActiveCustomer().id}`);
+
   // This could get messy quickly. Maybe a better way to parse the input?
   if(userInput.choice == '1') {
     createPaymentPrompt()

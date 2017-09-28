@@ -11,4 +11,4 @@ let setActiveCustomer = (id) => {
 let getActiveCustomer = () => activeCustomer;
 
 
-module.exports={setActiveCustomer, getActiveCustomer};
+module.exports = { setActiveCustomer, getActiveCustomer };
