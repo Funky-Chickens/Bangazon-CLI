@@ -13,7 +13,7 @@ const { promptNewCustomer } = require('./controllers/customerCtrl');
 const { postUserObj, getAllUsers } = require('./models/Customer');
 const { getActiveCustomer, setActiveCustomer } = require('./activeCustomer');
 const { newProductPrompt } = require('./controllers/productCtrl')
-const { postNewProduct } = require('./models/Product')
+const { postNewProduct, deletableProducts, deleteProduct } = require('./models/Product')
 
 const db = new Database(path.join(__dirname, '..', 'db', 'bangazon.sqlite'));
 

@@ -31,4 +31,22 @@ let postNewProduct = (prodObj) => {
     });
 };
 
-module.exports = { getAllUserProducts, postNewProduct };
+let deletableProducts = (id) => {
+    return new Promise( (resolve, reject) => {
+        db.all(`SELECT product_id, product_name FROM products as p WHERE NOT EXISTS (SELECT * FROM productOrders as po WHERE p.product_id = po.product_id) AND p.seller_id = ${id}`, function(err, deleteArr) {
+                if(err) return reject(err);
+                resolve(deleteArr);
+        });     
+    });
+};
+
+let deleteProduct = (productId) => {
+    return new Promise( (resolve, reject) => {
+        db.run(`DELETE FROM products WHERE product_id = ${productId}`, function(err) {
+            if(err) return reject(err);
+            resolve(this.changes);
+        });
+    });
+};
+
+module.exports = { getAllUserProducts, postNewProduct, deletableProducts, deleteProduct };

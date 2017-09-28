@@ -1,7 +1,7 @@
 'use strict';
 
 const { assert: {equal, isFunction, isObject, isArray, isNumber} } = require('chai');
-const { getAllUserProducts, postNewProduct } = require('../app/models/Product.js');
+const { getAllUserProducts, postNewProduct, deletableProducts, deleteProduct } = require('../app/models/Product.js');
 const { buildProductsDB } = require('../db/build-db.js');
 
 describe('Product', () => {
@@ -35,11 +35,21 @@ describe('Product', () => {
             }
         it('should be a function', () => isFunction(postNewProduct, 'Function?'));
         it('it should return a number', () => {
-            postNewProduct(testObj)
+            return postNewProduct(testObj)
             .then( (results) => {
                 isNumber(results);
             });
         });
     });
+    describe('Delete Products for seller', () => {
+        it('Should be a function', () => isFunction(deleteProduct, 'Function?'));
+        it('Should be a function', () => isFunction(deletableProducts, 'Function?'));
+        it('Should return 1', () => {
+            return deleteProduct(1)
+            .then( (result) => {
+                equal(result, 1);
+            });
+        })
+    })
     
 })
