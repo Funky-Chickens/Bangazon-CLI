@@ -1,14 +1,27 @@
 'use strict';
 
 const { assert: {equal, isFunction, isNull, isNumber, isObject} } = require('chai');
-const { checkForOpenOrders } = require('../app/models/Order.js');
+const { checkForOpenOrders, openOrderPost, getOneOrder } = require('../app/models/Order.js');
 
 describe('Check for open orders', () => {
     it('should be a function', () => isFunction(checkForOpenOrders, 'Function?'));
     it('should be a number', () => {
-        checkForOpenOrders(2)
+        return checkForOpenOrders(2)
         .then( (orderCheckResult) => {
             isNumber(orderCheckResult);
+        });
+    });
+});
+
+describe('Open Order Post', () => {
+    it('should be a function', () => isFunction(openOrderPost, 'Function?'));
+    it('should have the product that was posted', () => {
+        return openOrderPost(1, 8)
+        .then( (data) => {
+            return getOneOrder(1)
+            .then( (order) => {
+                equal(order[order.length -1].prod_id, 8);
+            });
         });
     });
 });

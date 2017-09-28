@@ -56,7 +56,7 @@ let functionThatCreatesTables = () => {
             )`);
             db.run(`CREATE TABLE IF NOT EXISTS productOrders(
                 order_id INTEGER NOT NULL,
-                product_id INTEGER NOT NULL,
+                prod_id INTEGER NOT NULL,
                 line_item_id INTEGER PRIMARY KEY NOT NULL
             )`);
             db.run(`CREATE TABLE IF NOT EXISTS productTypes(
@@ -93,9 +93,9 @@ function insertRows() {
         });
     }));
     //productOrders -el/gm
-    Promise.all(productOrdersContent.map( ({order_id, product_id}) => {
+    Promise.all(productOrdersContent.map( ({order_id, prod_id}) => {
         return new Promise( (resolve, reject) => {
-            db.run(`INSERT INTO productOrders VALUES (${order_id}, ${product_id}, null)`, function (err) {
+            db.run(`INSERT INTO productOrders VALUES (${order_id}, ${prod_id}, null)`, function (err) {
                 if (err) return reject (err);
                 resolve(this.lastID);
             });
