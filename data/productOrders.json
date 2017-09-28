@@ -2,31 +2,31 @@
     {
         "line_item_id": "2",
         "order_id": "1",
-        "product_id": "2"
+        "prod_id": "2"
     },
     {
         "line_item_id": "3",
         "order_id": "1",
-        "product_id": "3"
+        "prod_id": "3"
     },
     {
         "line_item_id": "4",
         "order_id": "1",
-        "product_id": "3"
+        "prod_id": "3"
     },
     {
         "line_item_id": "5",
         "order_id": "1",
-        "product_id": "3"
+        "prod_id": "3"
     },
     {
         "line_item_id": "6",
         "order_id": "1",
-        "product_id": "3"
+        "prod_id": "3"
     },
     {
         "line_item_id": "8",
         "order_id": "6",
-        "product_id": "9"
+        "prod_id": "9"
     }
 ]
