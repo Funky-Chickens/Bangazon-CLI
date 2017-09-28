@@ -13,38 +13,54 @@ let userContent = JSON.parse(readFileSync("./data/users.json"));
 
 //This compartmentalizes JUST the users DB functions to rebuild just that table rather than the whole database. - the ladies
 function buildUsersDB () {
-    db.serialize( () => {
-        db.run(`DROP TABLE IF EXISTS users`);
-        db.run(`CREATE TABLE IF NOT EXISTS users(
-                user_id INTEGER PRIMARY KEY NOT NULL,
-                first_name TEXT NOT NULL,
-                last_name TEXT NOT NULL,
-                start_date TEXT NOT NULL,
-                street_address TEXT NOT NULL,
-                city TEXT NOT NULL,
-                state TEXT NOT NULL,
-                postal_code INTEGER NOT NULL,
-                phone TEXT NOT NULL,
-                email TEXT NOT NULL
-            )`);
-        insertUserRows();
+    return new Promise( (resolve, reject) => {
+        db.serialize( () => {
+            db.run(`DROP TABLE IF EXISTS users`);
+            db.run(`CREATE TABLE IF NOT EXISTS users(
+                    user_id INTEGER PRIMARY KEY NOT NULL,
+                    first_name TEXT NOT NULL,
+                    last_name TEXT NOT NULL,
+                    start_date TEXT NOT NULL,
+                    street_address TEXT NOT NULL,
+                    city TEXT NOT NULL,
+                    state TEXT NOT NULL,
+                    postal_code INTEGER NOT NULL,
+                    phone TEXT NOT NULL,
+                    email TEXT NOT NULL
+                )`, function(err) {
+                    if (err) return reject(err);
+                    insertUserRows()
+                    .then( () => {
+                        resolve();
+                    });
+            })
+        })
     })
 }
 
 
 function buildProductOrdersDB () {
-    db.serialize( () => {
-        db.run(`DROP TABLE IF EXISTS productOrders`);
-        db.run(`CREATE TABLE IF NOT EXISTS productOrders(
-            order_id INTEGER NOT NULL,
-            prod_id INTEGER NOT NULL,
-            line_item_id INTEGER PRIMARY KEY NOT NULL
-        )`);
-        insertProductOrderRows();
+    return new Promise( (resolve, reject) => {
+         db.serialize( () => {
+            db.run(`DROP TABLE IF EXISTS productOrders`);
+            db.run(`CREATE TABLE IF NOT EXISTS productOrders(
+                order_id INTEGER NOT NULL,
+                prod_id INTEGER NOT NULL,
+                line_item_id INTEGER PRIMARY KEY NOT NULL
+            )`, function(err) {
+                if (err) return reject(err);
+                insertProductOrderRows()
+                .then( () => {
+                    resolve();
+                });
+            });
+        })
     })
 }
 
 function buildProductsDB () {
+    return new Promise ((resolve, reject) => {
+
     db.serialize( () => {
         db.run(`DROP TABLE IF EXISTS products`);
         db.run(`CREATE TABLE IF NOT EXISTS products(
@@ -55,45 +71,72 @@ function buildProductsDB () {
             description TEXT NOT NULL,
             quantity_avail INTEGER NOT NULL,
             price REAL NOT NULL
-        )`);
-        insertProductRows();
+        )`, function(err) {
+                if (err) return reject(err);
+                insertProductRows()
+                .then( () => {
+                    resolve();
+                });
+            });
+        })
     })
 }
 
 function buildProductTypeDB () {
-    db.serialize( () => {
-        db.run(`DROP TABLE IF EXISTS productTypes`);
-        db.run(`CREATE TABLE IF NOT EXISTS productTypes(
-            type_id INTEGER PRIMARY KEY NOT NULL,
-            label TEXT NOT NULL
-        )`);
-        insertProductTypesRows();
+    return new Promise( (resolve, reject) => {
+        db.serialize( () => {
+            db.run(`DROP TABLE IF EXISTS productTypes`);
+            db.run(`CREATE TABLE IF NOT EXISTS productTypes(
+                type_id INTEGER PRIMARY KEY NOT NULL,
+                label TEXT NOT NULL
+            )`, function(err) {
+                if (err) return reject(err);
+                insertProductTypesRows()
+                .then( () => {
+                    resolve();
+                });
+            });
+        })
     })
 }
 
 function buildPaymentsDB () {
-    db.serialize( () => {
-        db.run(`DROP TABLE IF EXISTS paymentOptions`);
-        db.run(`CREATE TABLE IF NOT EXISTS paymentOptions(
-            payment_id INTEGER PRIMARY KEY NOT NULL,
-            buyer_id INTEGER NOT NULL,
-            payment_option_name TEXT NOT NULL,
-            account_number INTEGER NOT NULL
-        )`);
-        insertPaymentsRows();
+    return new Promise( (resolve, reject) => {
+        db.serialize( () => {
+            db.run(`DROP TABLE IF EXISTS paymentOptions`);
+            db.run(`CREATE TABLE IF NOT EXISTS paymentOptions(
+                payment_id INTEGER PRIMARY KEY NOT NULL,
+                buyer_id INTEGER NOT NULL,
+                payment_option_name TEXT NOT NULL,
+                account_number INTEGER NOT NULL
+            )`, function(err) {
+                if (err) return reject(err);
+                insertPaymentsRows()
+                .then( () => {
+                    resolve();
+                });
+            });
+        })
     })
 }
 
 function buildOrdersDB () {
-    db.serialize( () => {
-        db.run(`DROP TABLE IF EXISTS orders`);
-        db.run(`CREATE TABLE IF NOT EXISTS orders(
-            order_id INTEGER PRIMARY KEY NOT NULL,
-            order_date TEXT NOT NULL,
-            payment_type INTEGER,
-            buyer_id INTEGER NOT NULL
-        )`);
-        insertOrderRows();
+    return new Promise( (resolve, reject) => {
+        db.serialize( () => {
+            db.run(`DROP TABLE IF EXISTS orders`);
+            db.run(`CREATE TABLE IF NOT EXISTS orders(
+                order_id INTEGER PRIMARY KEY NOT NULL,
+                order_date TEXT NOT NULL,
+                payment_type INTEGER,
+                buyer_id INTEGER NOT NULL
+            )`, function(err) {
+                    if (err) return reject(err);
+                    insertOrderRows()
+                    .then( () => {
+                        resolve();
+                    });
+                });
+        })
     })
 }
 
@@ -224,12 +267,5 @@ function insertOrderRows () {
           })  
     })
 }
-
-buildUsersDB(); 
-buildOrdersDB();
-buildPaymentsDB();
-buildProductsDB();
-buildProductTypeDB();
-buildProductOrdersDB();
 
 module.exports = { buildUsersDB, buildOrdersDB, buildPaymentsDB, buildProductsDB, buildProductTypeDB, buildProductOrdersDB };
