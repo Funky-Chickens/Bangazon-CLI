@@ -1,6 +1,6 @@
 'use strict';
 
-const { assert: {equal, isFunction, isObject, isArray, isNumber} } = require('chai');
+const { assert: {equal, isFunction, isObject, isArray, isNumber, notExists} } = require('chai');
 const { getAllUserProducts, postNewProduct, deletableProducts, deleteProduct } = require('../app/models/Product.js');
 const { buildProductsDB } = require('../db/build-db.js');
 
@@ -50,6 +50,12 @@ describe('Product', () => {
                 equal(result, 1);
             });
         })
+        // it('Should not be able to retrieve deleted product', () => {
+        //     return getSingleProduct(1)
+        //     .then( (result) => {
+        //         notExists(result);
+        //     });
+        // }) 
     })
     
 })

@@ -41,7 +41,7 @@ module.exports.newProductPrompt = () => {
   });
 };
 
-let deleteProdPrompt = () => {
+module.exports.deleteProdPrompt = () => {
   return new Promise( (resolve, reject) => {
     prompt.get([{
       name: 'productId',

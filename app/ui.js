@@ -12,7 +12,7 @@ prompt.message = colors.blue("Bangazon Corp");
 const { promptNewCustomer } = require('./controllers/customerCtrl');
 const { postUserObj, getAllUsers } = require('./models/Customer');
 const { getActiveCustomer, setActiveCustomer } = require('./activeCustomer');
-const { newProductPrompt } = require('./controllers/productCtrl')
+const { newProductPrompt, deleteProdPrompt } = require('./controllers/productCtrl')
 const { postNewProduct, deletableProducts, deleteProduct } = require('./models/Product')
 
 const db = new Database(path.join(__dirname, '..', 'db', 'bangazon.sqlite'));
@@ -139,9 +139,22 @@ let customerMenuHandler = (err, userInput) => {
       //run function to update product information
     })
   } else if (userInput.choice == '6') {
+    deletableProducts(Number(getActiveCustomer().id))
+    .then( (results) => {
+      console.log("deletable products: ", results);
+    })
+    .catch((err) => {
+      console.log("deletable products error", err);
+    })
     deleteProdPrompt()
-    .then( () => {
-      console.log('this product has been deleted');
+    .then( (productObj) => {
+      deleteProduct(productObj.productId)
+      .then( (result) => {
+        console.log('this product has been deleted'); 
+      })
+      .catch((err) => {
+        console.log("delete product error", err)
+      })
       //run function to get popularity of entered product
     })
   } else if (userInput.choice == '7') {
