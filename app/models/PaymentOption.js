@@ -15,6 +15,4 @@ let postPaymentOption = (buyerId, paymentType, acctNumber) => {
     });
 };
 
-
-
 module.exports = { postPaymentOption };
