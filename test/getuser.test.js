@@ -4,6 +4,7 @@ const { assert: {equal, property, isFunction, isArray, isObject} } = require('ch
 const { getOneUser, postUserObj, getAllUsers } = require('../app/models/Customer.js');
 
 describe('Customer', () => {//model
+  //TODO before hook?
   describe('Get One Customer', () => {//feature
     it('should be a function', () => isFunction(getOneUser, 'Function?'));
     it('should return an object', () => {
@@ -25,3 +26,4 @@ describe('Customer', () => {//model
     })
   })
 })
+
