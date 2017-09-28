@@ -8,11 +8,13 @@ const db = new Database(dbPath);
 
 let postPaymentOption = (buyerId, paymentType, acctNumber) => {
     return new Promise( (resolve, reject) => {
-        db.get(`INSERT into paymentOptions VALUES (null, ${buyerId}, ${paymentType}, ${acctNumber})`, (err, user) => {
+        db.run(`INSERT into paymentOptions VALUES (null, ${buyerId}, "${paymentType}", ${acctNumber})`, function (err) {
                 if (err) return reject(err);
-                resolve(user);
+                resolve();
         });
     });
 };
+
+
 
 module.exports = { postPaymentOption };
