@@ -35,7 +35,6 @@ module.exports.displayWelcome = () => {
 };
 
 let mainMenuHandler = (err, userInput) => {
-  console.log("user input", userInput);
   // This could get messy quickly. Maybe a better way to parse the input?
   if(userInput.choice == '1') {
     promptNewCustomer() //in customerCtrl.js
@@ -56,7 +55,6 @@ let mainMenuHandler = (err, userInput) => {
     activeCustomerPrompt()
     .then( (activeCustomer) => {
       //get active customer and set active customer
-      console.log(activeCustomer.customerId)
       setActiveCustomer(activeCustomer.customerId);
       console.log(`Customer ${activeCustomer.customerId} is now active.`);
       //run active customer function that opens the customerMenuHandler
