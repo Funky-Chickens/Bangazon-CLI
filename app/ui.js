@@ -10,6 +10,7 @@ prompt.message = colors.blue("Bangazon Corp");
 
 // app modules
 const { promptNewCustomer } = require('./controllers/customerCtrl')
+const { postUserObj } = require('./models/Customer')
 
 const db = new Database(path.join(__dirname, '..', 'db', 'bangazon.sqlite'));
 
@@ -36,11 +37,19 @@ let mainMenuHandler = (err, userInput) => {
   console.log("user input", userInput);
   // This could get messy quickly. Maybe a better way to parse the input?
   if(userInput.choice == '1') {
-    promptNewCustomer()
+    promptNewCustomer() //in customerCtrl.js
     .then( (custData) => {
-      console.log('customer data to save:', custData );
       custData.start_date = date;
-      //save customer to db
+      //save customer to db - cr
+      postUserObj(custData) //in Customer.js
+      .then( (result) => {
+        console.log("This new customer was saved with the ID: ", result);
+        module.exports.displayWelcome();
+      })
+      .catch( (err) => {
+        console.log("errormagherd", err);
+      }); 
+      //-ladies
     });
   } else if (userInput.choice == '2'){
     activeCustomerPrompt()
