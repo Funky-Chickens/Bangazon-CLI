@@ -10,8 +10,9 @@ const { buildUsersDB } = require('../db/build-db.js');
 
 //global before() drops old and creates new tables before tests begin in any file -jmr
 before( function() {
-  // this.timeout(TIMEOUT);
+  
   buildUsersDB()
+  this.timeout(TIMEOUT);
   // .then( () => done()); 
 });
 
