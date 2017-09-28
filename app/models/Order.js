@@ -26,24 +26,23 @@ let getOneOrder = (id) => {
     return new Promise( (resolve, reject) => {//select order by order id and see order name
         db.all(`SELECT *
             FROM orders
-            LEFT JOIN productOrders ON orders.order_id = productOrders.order_id 
-            LEFT JOIN products ON products.product_id = productOrders.prod_id
             WHERE orders.order_id = ${id}`, (err, order) => {
                 if (err) return reject(err);
-                if (order.length) resolve(order);
+                if (order.length) resolve(order[0]);
                 else return reject("No such ID");
             });
     });
 }
 
-let openOrderPost = (orderId, productId) => {
+
+let postOrder = (order_date, buyer_id) => {
     return new Promise( (resolve, reject) => {
-        db.run(`INSERT INTO productOrders VALUES (${orderId}, ${productId}, NULL
-        )`, (err) => {
+        db.run(`INSERT INTO orders VALUES (null,"${order_date}", null, ${buyer_id}
+        )`, function(err) {
             if (err) return reject(err);
-            resolve()
+            resolve(this.lastID)
         });
     });
 }
 
-module.exports = { checkForOpenOrders, openOrderPost, getOneOrder };
+module.exports = { checkForOpenOrders, postOrder, getOneOrder };
