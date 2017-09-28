@@ -24,5 +24,4 @@ describe('Customer', () => {//model
       })
     })
   })
-})
-
+});
