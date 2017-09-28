@@ -9,8 +9,9 @@ const { Database } = require('sqlite3').verbose();
 prompt.message = colors.blue("Bangazon Corp");
 
 // app modules
-const { promptNewCustomer } = require('./controllers/customerCtrl')
-const { postUserObj } = require('./models/Customer')
+const { promptNewCustomer } = require('./controllers/customerCtrl');
+const { postUserObj, getAllUsers } = require('./models/Customer');
+const { getActiveCustomer, setActiveCustomer } = require('./activeCustomer');
 
 const db = new Database(path.join(__dirname, '..', 'db', 'bangazon.sqlite'));
 
@@ -34,7 +35,6 @@ module.exports.displayWelcome = () => {
 };
 
 let mainMenuHandler = (err, userInput) => {
-  console.log("user input", userInput);
   // This could get messy quickly. Maybe a better way to parse the input?
   if(userInput.choice == '1') {
     promptNewCustomer() //in customerCtrl.js
@@ -54,10 +54,14 @@ let mainMenuHandler = (err, userInput) => {
   } else if (userInput.choice == '2'){
     activeCustomerPrompt()
     .then( (activeCustomer) => {
-      console.log('this customer is now active:', activeCustomer)
+      //get active customer and set active customer
+      setActiveCustomer(activeCustomer.customerId);
+      console.log(`Customer ${activeCustomer.customerId} is now active.`);
       //run active customer function that opens the customerMenuHandler
+      printAllCustomers();
     });
   } else if (userInput.choice == '3') {
+    console.log("Thank you for visiting Bangazon.  Goodbye.")
     prompt.stop();
   }
 };
@@ -66,7 +70,7 @@ let printAllCustomers = () => {
 let headerDivider = `${magenta('*********************************************************')}`
   console.log(`
   ${headerDivider}
-  ${magenta('**  Bangazon Customer Menu! You are currently working with customer id   **')}
+  ${magenta(`**  Bangazon Customer Menu  **`)}
   ${headerDivider}
   ${magenta('1.')} Create a payment option
   ${magenta('2.')} Add product to shopping cart
@@ -84,7 +88,8 @@ let headerDivider = `${magenta('************************************************
 }
 
 let customerMenuHandler = (err, userInput) => {
-  console.log("user input", userInput);
+  console.log(`You are currently working with customer id ${getActiveCustomer().id}`);
+
   // This could get messy quickly. Maybe a better way to parse the input?
   if(userInput.choice == '1') {
     createPaymentPrompt()
@@ -144,16 +149,22 @@ let customerMenuHandler = (err, userInput) => {
 
 let activeCustomerPrompt = () => {
   return new Promise( (resolve, reject) => {
-    prompt.get([{
-      name: 'customerId',
-      description: "Enter the customer's Id",
-      type: 'string',
-      required: true
-    }], function(err, results) {
-      if (err) return reject(err);
-      resolve(results);
+    getAllUsers()//GET list of all customer names and ids using customer js model
+    .then((allUsers)=>{
+      allUsers.forEach((user) => {
+        console.log(`${user.user_id}: ${user.Name}`)
+      });
+        prompt.get([{
+          name: 'customerId',
+          description: "Enter the customer's Id",
+          type: 'string',
+          required: true
+        }], function(err, results) {
+          if (err) return reject(err);
+          resolve(results);
+      })
     })
-  });
+  })
 };
 
 let createPaymentPrompt = () => {
