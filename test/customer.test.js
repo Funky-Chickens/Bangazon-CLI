@@ -9,13 +9,12 @@ const { getOneUser, postUserObj } = require('../app/models/Customer.js');
 const { buildUsersDB } = require('../db/build-db.js');
 
 //global before() drops old and creates new tables before tests begin in any file -jmr
-before( function() {
-  buildUsersDB()
-  this.timeout(TIMEOUT);
-});
-
 describe('Customer', () => {
-  describe('POST function', () => {
+  before( function(done) {
+    buildUsersDB()
+    .then( () => done()); 
+  });
+  describe('POST new user function', () => {
     let testObj = {
       first_name: "Jason",
       last_name: "Monahajt",
@@ -31,14 +30,12 @@ describe('Customer', () => {
     it('should return "lastID"', () => {
       return postUserObj(testObj)
       .then( (results) => {
-        console.log("last ID", results);
         isNumber(results);
       });
     });
     it('should get the userObject that was just input', () => {
       return getOneUser(1)
         .then( (oneUser) => {
-          console.log("results of getOneUser", oneUser);
           property(oneUser, 'last_name');
       });
     });
