@@ -19,7 +19,6 @@ describe('Customer', () => {//model
     it('should get all userObjects in an array', () =>{
       return getAllUsers()
       .then( (allUsers) =>{
-        console.log("results of getAll users", allUsers);
         isArray(allUsers);
       })
     })
