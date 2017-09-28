@@ -17,7 +17,7 @@ let getOneUser = (id) => {//call in ui.js in .then -el/gm
     });
 };
 
-//injects the user's data -jmr
+//injects the user's data into the DB and resolves back to ui.js - crgmel
 let postUserObj = (userObj) => {
     return new Promise( (resolve, reject) => {
         db.run(`INSERT INTO users VALUES (null, 

@@ -2,6 +2,7 @@
 
 const prompt = require('prompt');
 
+//make sure the name of each property matches the object properties passed to the function using this data object
 module.exports.promptNewCustomer = () => {
   return new Promise( (resolve, reject) => {
     prompt.get([{
@@ -15,7 +16,7 @@ module.exports.promptNewCustomer = () => {
       type: 'string',
       required: true
     }, {
-      name: 'street',
+      name: 'street_address',
       description: 'Enter street address',
       type: 'string',
       required: true
@@ -30,7 +31,7 @@ module.exports.promptNewCustomer = () => {
       type: 'string',
       required: true
     }, {
-      name: 'zip',
+      name: 'postal_code',
       description: 'Enter postal code',
       type: 'string',
       required: true
@@ -46,7 +47,7 @@ module.exports.promptNewCustomer = () => {
       required: true
     }], function(err, results) {
       if (err) return reject(err);
-      resolve(results);
+      resolve(results); //resolves back to ui.js - crgmel
     })
   });
 };
