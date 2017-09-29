@@ -5,8 +5,10 @@ const chai = require("chai");
 const chaiAsPromised = require("chai-as-promised");
 chai.use(chaiAsPromised);
 const { assert: {property, eventually, equal, isNumber, exists, isFunction, isObject, isEqual, deepEqual} } = require('chai');
-const { postPaymentOption } = require('../app/models/PaymentOption.js');
+const { postPaymentOption, getUsersPaymentOptions, addPaymentToOrder} = require('../app/models/PaymentOption.js');
+const { getOneOrder } = require('../app/models/Order.js');
 const { buildPaymentsDB } = require('../db/build-db.js');
+
 
 describe('PaymentOptions', () => {
     before( function(done) {
@@ -26,6 +28,23 @@ describe('PaymentOptions', () => {
             ); 
         });
     });
+    describe('GET function', () => {
+        it('should be a function', () => isFunction(getUsersPaymentOptions, "getUsersPaymentOptions is a function"));
+        it('should get the object containing users payment options', () => {
+        return getUsersPaymentOptions(2).then( () => { 
+        }
+            ); 
+        });
+    });
+    describe('POST function', () => {
+        it('should be a function', () => isFunction(addPaymentToOrder, "addPaymentToOrder is a function"));
+        it('should post the selected payment option to the customers open order', () => {
+        return addPaymentToOrder(2,2).then( () => { 
+        }
+            ); 
+        });
+    });
+
 });
 
  
