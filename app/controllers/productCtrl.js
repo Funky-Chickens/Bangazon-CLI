@@ -45,7 +45,7 @@ module.exports.deleteProdPrompt = () => {
   return new Promise( (resolve, reject) => {
     prompt.get([{
       name: 'productId',
-      description: "Enter the product Id",
+      description: "Enter the product Id to be deleted",
       type: 'number',
       required: true
     }], function(err, results) {

@@ -33,7 +33,11 @@ let postNewProduct = (prodObj) => {
 
 let deletableProducts = (id) => {
     return new Promise( (resolve, reject) => {
-        db.all(`SELECT product_id, product_name FROM products WHERE NOT EXISTS (SELECT * FROM productOrders WHERE products.product_id = productOrders.prod_id AND products.seller_id = ${id})`, function(err, deleteArr) {
+        db.all(`SELECT products.product_id, products.product_name FROM users 
+            LEFT JOIN products ON users.user_id = products.seller_id
+            LEFT JOIN productOrders ON products.product_id = productOrders.prod_id
+            LEFT JOIN orders ON productOrders.order_id = orders.order_id
+            WHERE orders.order_id IS NULL AND products.product_id IS NOT NULL AND users.user_id = ${id}`, function(err, deleteArr) {
                 if(err) return reject(err);
                 resolve(deleteArr);
         });     

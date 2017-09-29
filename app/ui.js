@@ -141,22 +141,26 @@ let customerMenuHandler = (err, userInput) => {
   } else if (userInput.choice == '6') {
     deletableProducts(Number(getActiveCustomer().id))
     .then( (results) => {
-      console.log("deletable products: ", results);
+      results.forEach( (item) => {
+        console.log("deletable products: ");
+        console.log(item.product_id, item.product_name);
+      })
+      deleteProdPrompt()
+      .then( (productObj) => {
+        deleteProduct(productObj.productId)
+        .then( (result) => {
+         console.log('this product has been deleted'); 
+        })
+        .catch((err) => {
+         console.log("delete product error", err)
+        })
+      //run function to get popularity of entered product
+    })
     })
     .catch((err) => {
       console.log("deletable products error", err);
     })
-    deleteProdPrompt()
-    .then( (productObj) => {
-      deleteProduct(productObj.productId)
-      .then( (result) => {
-        console.log('this product has been deleted'); 
-      })
-      .catch((err) => {
-        console.log("delete product error", err)
-      })
-      //run function to get popularity of entered product
-    })
+    
   } else if (userInput.choice == '7') {
     productPopPrompt()
     .then( (productPop) => {
