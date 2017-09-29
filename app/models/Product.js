@@ -8,19 +8,19 @@ const db = new Database(dbPath);
 
 let getAllUserProducts = (id) => {
     return new Promise( (resolve, reject) => {
-        db.all(`SELECT products.seller_id, products.product_name AS "Name" FROM users 
+        db.all(`SELECT products.product_id, products.seller_id, products.product_name AS "Name" FROM users 
         JOIN products where products.seller_id = users.user_id AND products.seller_id = ${id}
     `, (err, prods) => {
             if (err) return reject(err);
-            if (prods[0].seller_id) {
+            if (prods[0] && prods[0].seller_id) {
                 resolve(prods);
             } else {
                 console.log("no products available");
             }
         });
     });
-
 };
+
 
 let postNewProduct = (prodObj) => {
     return new Promise( (resolve, reject) => {
@@ -30,6 +30,20 @@ let postNewProduct = (prodObj) => {
         });
     });
 };
+
+let getAllProducts = () => {
+    return new Promise( (resolve, reject) => {
+        db.all(`SELECT products.product_id, products.seller_id, products.product_name AS "Name" FROM products
+        `, (err, prods) => {
+            if (err) return reject(err);
+            if (prods[0]) {
+                resolve(prods);
+            } else {
+                console.log("no products available");
+            }
+        });
+    });
+}
 
 let deletableProducts = (id) => {
     return new Promise( (resolve, reject) => {
@@ -64,4 +78,4 @@ let getSellerProduct  = ( id) => {
         });
 };
 
-module.exports = { getAllUserProducts, postNewProduct, deletableProducts, deleteProduct, getSellerProduct};
+module.exports = { getAllUserProducts, getAllProducts, postNewProduct, deletableProducts, deleteProduct, getSellerProduct};
