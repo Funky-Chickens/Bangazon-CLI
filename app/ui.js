@@ -14,6 +14,7 @@ const { postUserObj, getAllUsers } = require('./models/Customer');
 const { getActiveCustomer, setActiveCustomer } = require('./activeCustomer');
 const { newProductPrompt, deleteProdPrompt } = require('./controllers/productCtrl')
 const { postNewProduct, deletableProducts, deleteProduct } = require('./models/Product')
+const { getPayment } = require('./controllers/paymentCtrl')
 
 const db = new Database(path.join(__dirname, '..', 'db', 'bangazon.sqlite'));
 
@@ -94,11 +95,14 @@ let customerMenuHandler = (err, userInput) => {
 
   // This could get messy quickly. Maybe a better way to parse the input?
   if(userInput.choice == '1') {
-    createPaymentPrompt()
+    getPayment(Number(getActiveCustomer().id))
     .then( (paymentData) => {
-      console.log('payment data to save:', paymentData);
+      console.log('payment type Added!');
+      printAllCustomers();
       //run post payment function and return to menu
-    });   
+    }).catch( (err) => {
+      console.log("errormagherd", err);
+    }); ;   
   } else if (userInput.choice == '2') {
     addToCartPrompt()
     .then( (cartItem) => {
@@ -195,25 +199,6 @@ let activeCustomerPrompt = () => {
   })
 };
 
-let createPaymentPrompt = () => {
-  return new Promise( (resolve, reject) => {
-    prompt.get([{
-      name: 'paymentName',
-      description: "Enter the payment option name",
-      type: 'string',
-      required: true
-    },
-    {
-      name: 'accountNum',
-      description: "Enter the account number",
-      type: 'number',
-      required: true
-    }], function(err, results) {
-      if (err) return reject(err);
-      resolve(results);
-    })
-  });
-};
 
 let addToCartPrompt = () => {
   return new Promise( (resolve, reject) => {
