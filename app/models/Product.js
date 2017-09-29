@@ -19,7 +19,20 @@ let getAllUserProducts = (id) => {
             }
         });
     });
-
 };
 
-module.exports = { getAllUserProducts };
+let getAllProducts = () => {
+    return new Promise( (resolve, reject) => {
+        db.all(`SELECT products.product_id, products.seller_id, products.product_name AS "Name" FROM products
+        `, (err, prods) => {
+            if (err) return reject(err);
+            if (prods[0]) {
+                resolve(prods);
+            } else {
+                console.log("no products available");
+            }
+        });
+    });
+}
+
+module.exports = { getAllUserProducts, getAllProducts };

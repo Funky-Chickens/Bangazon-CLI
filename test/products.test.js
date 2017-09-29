@@ -1,7 +1,7 @@
 'use strict';
 
 const { assert: {equal, isFunction, isObject, isArray} } = require('chai');
-const { getAllUserProducts } = require('../app/models/Product.js');
+const { getAllProducts, getAllUserProducts } = require('../app/models/Product.js');
 
 describe('Get User Products', () => {
     it('should be a function', () => isFunction(getAllUserProducts, 'Function?'));
@@ -15,6 +15,15 @@ describe('Get User Products', () => {
         return getAllUserProducts(3)
         .then( (user) => {
             equal(user[0].seller_id, 3);
+        });
+    });
+    describe('Gets All Products', () => {
+        it('should be a function', () => isFunction(getAllProducts, 'Function?'));
+        it('should return an array', () => {
+            return getAllProducts(3)
+            .then( (prods) => {
+                isArray(prods);
+            });
         });
     });
 });

@@ -100,23 +100,22 @@ let customerMenuHandler = (err, userInput) => {
       //run post payment function and return to menu
     });   
   } else if (userInput.choice == '2') {
-    console.log("from ui", getActiveCustomer().id)
-    addToCartStart(getActiveCustomer().id)
+    addToCartStart()
     .then( (prodObjs) => {
-      console.log("ui cart start", prodObjs)
+      if(prodObjs.length === 0) {
+        console.log("No Products Available")
+        printAllCustomers()
+      } else {
       displayProducts(prodObjs);
       addToCartPrompt()
       .then( (data) => {
-        console.log("args from menu handler", data, prodObjs)
         addToCart(data.Product, prodObjs, getActiveCustomer().id)
         .then( () => {
+          printAllCustomers()
         });
-
       })
+    }
     });
-    // console.log('item added to cart:', cartItem);
-      // addToCart(cartItem.productId)
-      //run post item to cart function
     } else if (userInput.choice == '3') {
       module.exports.displayOrder();
     } else if (userInput.choice == '4') {
@@ -206,7 +205,7 @@ let displayProducts = (prodObjs) => {
   let headerDivider = `${magenta('*********************************************************')}`
   console.log(`
   ${headerDivider}
-  ${magenta(`**  Bangazon Customer Products  **`)}
+  ${magenta(`**  Bangazon Products  **`)}
   ${headerDivider}`);
   prodObjs.forEach( (prod, i) => {
       console.log(`${magenta(`${i + 1}. `)}${prod.Name}`)
@@ -222,7 +221,6 @@ let addToCartPrompt = () => {
       required: true
     }], function(err, results) {
       if (err) return reject(err);
-      console.log("results from addtocart prompt", results)
       resolve(results);
     })
   });
