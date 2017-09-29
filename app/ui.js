@@ -12,6 +12,8 @@ prompt.message = colors.blue("Bangazon Corp");
 const { promptNewCustomer } = require('./controllers/customerCtrl');
 const { postUserObj, getAllUsers } = require('./models/Customer');
 const { getActiveCustomer, setActiveCustomer } = require('./activeCustomer');
+const { newProductPrompt, deleteProdPrompt } = require('./controllers/productCtrl')
+const { postNewProduct, deletableProducts, deleteProduct } = require('./models/Product')
 
 const db = new Database(path.join(__dirname, '..', 'db', 'bangazon.sqlite'));
 
@@ -108,9 +110,17 @@ let customerMenuHandler = (err, userInput) => {
   } else if (userInput.choice == '4') {
     newProductPrompt()
     .then( (newProduct) => {
-      console.log('this product has been added:', newProduct);
-      //run function to post new product
-    })
+      newProduct.seller_id = Number(getActiveCustomer().id);
+      postNewProduct(newProduct)
+      .then ( (result) => {
+        console.log("This new product was saved with the ID: ", result);
+        printAllCustomers();
+        //run function to post new product
+      })
+        .catch ( (err) => {
+          console.log("new product error", err);
+      });
+    });
   } else if (userInput.choice == '5') {
     productPopPrompt()
     .then( (updatedProd) => {
@@ -129,11 +139,29 @@ let customerMenuHandler = (err, userInput) => {
       //run function to update product information
     })
   } else if (userInput.choice == '6') {
-    deleteProdPrompt()
-    .then( () => {
-      console.log('this product has been deleted');
+    deletableProducts(Number(getActiveCustomer().id))
+    .then( (results) => {
+      results.forEach( (item) => {
+        console.log("deletable products: ");
+        console.log(item.product_id, item.product_name);
+      })
+      deleteProdPrompt()
+      .then( (productObj) => {
+        deleteProduct(productObj.productId)
+        .then( (result) => {
+         console.log('this product has been deleted'); 
+         printAllCustomers();
+        })
+        .catch((err) => {
+         console.log("delete product error", err)
+        })
       //run function to get popularity of entered product
     })
+    })
+    .catch((err) => {
+      console.log("deletable products error", err);
+    })
+    
   } else if (userInput.choice == '7') {
     productPopPrompt()
     .then( (productPop) => {
@@ -188,72 +216,6 @@ let createPaymentPrompt = () => {
 };
 
 let addToCartPrompt = () => {
-  return new Promise( (resolve, reject) => {
-    prompt.get([{
-      name: 'productId',
-      description: "Enter the product Id",
-      type: 'number',
-      required: true
-    }], function(err, results) {
-      if (err) return reject(err);
-      resolve(results);
-    })
-  });
-};
-
-let newProductPrompt = () => {
-  return new Promise( (resolve, reject) => {
-    prompt.get([{
-      name: 'productName',
-      description: "Enter the product name",
-      type: 'string',
-      required: true
-    },
-    {
-      name: 'productPrice',
-      description: "Enter the product's Price",
-      type: 'string',
-      required: true
-    },
-    {
-      name: 'productDesc',
-      description: "Enter the product description",
-      type: 'string',
-      required: true
-    },
-    {
-      name: 'productTypeId',
-      description: "Enter the product type Id",
-      type: 'number',
-      required: true
-    },
-    {
-      name: 'quantityAvail',
-      description: "Enter the quantity available",
-      type: 'number',
-      required: true
-    }], function(err, results) {
-      if (err) return reject(err);
-      resolve(results);
-    })
-  });
-};
-
-let deleteProdPrompt = () => {
-  return new Promise( (resolve, reject) => {
-    prompt.get([{
-      name: 'productId',
-      description: "Enter the product Id",
-      type: 'number',
-      required: true
-    }], function(err, results) {
-      if (err) return reject(err);
-      resolve(results);
-    })
-  });
-};
-
-let productPopPrompt = () => {
   return new Promise( (resolve, reject) => {
     prompt.get([{
       name: 'productId',

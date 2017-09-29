@@ -22,4 +22,46 @@ let getAllUserProducts = (id) => {
 
 };
 
-module.exports = { getAllUserProducts };
+let postNewProduct = (prodObj) => {
+    return new Promise( (resolve, reject) => {
+        db.run(`INSERT INTO products VALUES (null, ${prodObj.product_type_id}, ${prodObj.seller_id}, "${prodObj.product_name}", "${prodObj.description}", ${prodObj.quantity_avail}, ${prodObj.price})`, function(err) {
+                if(err) return reject(err);
+                resolve(this.lastID);
+        });
+    });
+};
+
+let deletableProducts = (id) => {
+    return new Promise( (resolve, reject) => {
+        db.all(`SELECT products.product_id, products.product_name FROM users 
+            LEFT JOIN products ON users.user_id = products.seller_id
+            LEFT JOIN productOrders ON products.product_id = productOrders.prod_id
+            LEFT JOIN orders ON productOrders.order_id = orders.order_id
+            WHERE orders.order_id IS NULL AND products.product_id IS NOT NULL AND users.user_id = ${id}`, function(err, deleteArr) {
+                if(err) return reject(err);
+                resolve(deleteArr);
+        });     
+    });
+};
+
+let deleteProduct = (productId) => {
+    return new Promise( (resolve, reject) => {
+        db.run(`DELETE FROM products WHERE product_id = ${productId}`, function(err) {
+            if(err) return reject(err);
+            resolve(this.changes);
+        });
+    });
+};
+
+let getSellerProduct  = ( id) => {
+        return new Promise( (resolve, reject) => {//select product by product id
+            db.get(`SELECT *
+                FROM products
+                WHERE seller_id = ${id} AND product_id = 2`, (err, user)=>{
+                    if (err) return reject(err);
+                    resolve(user);
+                });
+        });
+};
+
+module.exports = { getAllUserProducts, postNewProduct, deletableProducts, deleteProduct, getSellerProduct};
