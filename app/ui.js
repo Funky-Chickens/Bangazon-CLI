@@ -12,10 +12,12 @@ prompt.message = colors.blue("Bangazon Corp");
 const { promptNewCustomer } = require('./controllers/customerCtrl');
 const { postUserObj, getAllUsers } = require('./models/Customer');
 const { getActiveCustomer, setActiveCustomer } = require('./activeCustomer');
+const { addToCartStart, addToCart } = require('./controllers/orderCtrl');
 
 const db = new Database(path.join(__dirname, '..', 'db', 'bangazon.sqlite'));
 
 let date = new Date;
+
 
 prompt.start();
 
@@ -67,7 +69,7 @@ let mainMenuHandler = (err, userInput) => {
 };
 
 let printAllCustomers = () => {
-let headerDivider = `${magenta('*********************************************************')}`
+  let headerDivider = `${magenta('*********************************************************')}`
   console.log(`
   ${headerDivider}
   ${magenta(`**  Bangazon Customer Menu  **`)}
@@ -81,15 +83,15 @@ let headerDivider = `${magenta('************************************************
   ${magenta('7.')} See product popularity
   ${magenta('8.')} Return to the main menu
   ${magenta('9.')} Leave Bangazon!`);
-    prompt.get([{
-      name: 'choice',
-      description: 'Please make a selection'
-    }], customerMenuHandler );
+  prompt.get([{
+    name: 'choice',
+    description: 'Please make a selection'
+  }], customerMenuHandler );
 }
 
 let customerMenuHandler = (err, userInput) => {
   console.log(`You are currently working with customer id ${getActiveCustomer().id}`);
-
+  
   // This could get messy quickly. Maybe a better way to parse the input?
   if(userInput.choice == '1') {
     createPaymentPrompt()
@@ -98,62 +100,74 @@ let customerMenuHandler = (err, userInput) => {
       //run post payment function and return to menu
     });   
   } else if (userInput.choice == '2') {
-    addToCartPrompt()
-    .then( (cartItem) => {
-      console.log('item added to cart:', cartItem);
+    console.log("from ui", getActiveCustomer().id)
+    addToCartStart(getActiveCustomer().id)
+    .then( (prodObjs) => {
+      console.log("ui cart start", prodObjs)
+      displayProducts(prodObjs);
+      addToCartPrompt()
+      .then( (data) => {
+        console.log("args from menu handler", data, prodObjs)
+        addToCart(data.Product, prodObjs, getActiveCustomer().id)
+        .then( () => {
+        });
+
+      })
+    });
+    // console.log('item added to cart:', cartItem);
+      // addToCart(cartItem.productId)
       //run post item to cart function
-    })
-  } else if (userInput.choice == '3') {
-    module.exports.displayOrder();
-  } else if (userInput.choice == '4') {
-    newProductPrompt()
-    .then( (newProduct) => {
-      console.log('this product has been added:', newProduct);
-      //run function to post new product
-    })
+    } else if (userInput.choice == '3') {
+      module.exports.displayOrder();
+    } else if (userInput.choice == '4') {
+      newProductPrompt()
+      .then( (newProduct) => {
+        console.log('this product has been added:', newProduct);
+        //run function to post new product
+      })
   } else if (userInput.choice == '5') {
     productPopPrompt()
     .then( (updatedProd) => {
       console.log(`
-        ${magenta('1.')} Product Name
-        ${magenta('2.')} Product Description
-        ${magenta('3.')} Product Price
-        ${magenta('4.')} Product Type Id
-        ${magenta('5.')} Quantity Available
+      ${magenta('1.')} Product Name
+      ${magenta('2.')} Product Description
+      ${magenta('3.')} Product Price
+      ${magenta('4.')} Product Type Id
+      ${magenta('5.')} Quantity Available
         ${magenta('6.')} Return to Customer Menu`)
         prompt.get([{
           name: 'choice',
           description: 'Please make a selection'
         }], productMenuHandler );
-      // console.log('these changes have been made to the product:', updatedProd);
-      //run function to update product information
-    })
-  } else if (userInput.choice == '6') {
-    deleteProdPrompt()
-    .then( () => {
-      console.log('this product has been deleted');
-      //run function to get popularity of entered product
-    })
-  } else if (userInput.choice == '7') {
-    productPopPrompt()
-    .then( (productPop) => {
-      console.log('the popularity for', productPop, 'is:');
-      //run function to get popularity of entered product
-    })
-  } else if (userInput.choice == '8') {
-    module.exports.displayWelcome();
-  } else if (userInput.choice == '9') {
-    prompt.stop();
-  }
-};
-
-let activeCustomerPrompt = () => {
-  return new Promise( (resolve, reject) => {
-    getAllUsers()//GET list of all customer names and ids using customer js model
-    .then((allUsers)=>{
-      allUsers.forEach((user) => {
-        console.log(`${user.user_id}: ${user.Name}`)
-      });
+        // console.log('these changes have been made to the product:', updatedProd);
+        //run function to update product information
+      })
+    } else if (userInput.choice == '6') {
+      deleteProdPrompt()
+      .then( () => {
+        console.log('this product has been deleted');
+        //run function to get popularity of entered product
+      })
+    } else if (userInput.choice == '7') {
+      productPopPrompt()
+      .then( (productPop) => {
+        console.log('the popularity for', productPop, 'is:');
+        //run function to get popularity of entered product
+      })
+    } else if (userInput.choice == '8') {
+      module.exports.displayWelcome();
+    } else if (userInput.choice == '9') {
+      prompt.stop();
+    }
+  };
+  
+  let activeCustomerPrompt = () => {
+    return new Promise( (resolve, reject) => {
+      getAllUsers()//GET list of all customer names and ids using customer js model
+      .then((allUsers)=>{
+        allUsers.forEach((user) => {
+          console.log(`${user.user_id}: ${user.Name}`)
+        });
         prompt.get([{
           name: 'customerId',
           description: "Enter the customer's Id",
@@ -162,40 +176,53 @@ let activeCustomerPrompt = () => {
         }], function(err, results) {
           if (err) return reject(err);
           resolve(results);
+        })
       })
     })
-  })
-};
-
-let createPaymentPrompt = () => {
-  return new Promise( (resolve, reject) => {
-    prompt.get([{
-      name: 'paymentName',
-      description: "Enter the payment option name",
-      type: 'string',
-      required: true
-    },
-    {
-      name: 'accountNum',
-      description: "Enter the account number",
-      type: 'number',
-      required: true
-    }], function(err, results) {
-      if (err) return reject(err);
-      resolve(results);
-    })
+  };
+  
+  let createPaymentPrompt = () => {
+    return new Promise( (resolve, reject) => {
+      prompt.get([{
+        name: 'paymentName',
+        description: "Enter the payment option name",
+        type: 'string',
+        required: true
+      },
+      {
+        name: 'accountNum',
+        description: "Enter the account number",
+        type: 'number',
+        required: true
+      }], function(err, results) {
+        if (err) return reject(err);
+        resolve(results);
+      })
   });
 };
+
+//DISPLAY PRODUCTS: takes any array of objects and displays them numberically (1, 2, 3...) -jmr
+let displayProducts = (prodObjs) => {
+  let headerDivider = `${magenta('*********************************************************')}`
+  console.log(`
+  ${headerDivider}
+  ${magenta(`**  Bangazon Customer Products  **`)}
+  ${headerDivider}`);
+  prodObjs.forEach( (prod, i) => {
+      console.log(`${magenta(`${i + 1}. `)}${prod.Name}`)
+  });
+}
 
 let addToCartPrompt = () => {
   return new Promise( (resolve, reject) => {
     prompt.get([{
-      name: 'productId',
-      description: "Enter the product Id",
+      name: 'Product',
+      description: "Enter the product",
       type: 'number',
       required: true
     }], function(err, results) {
       if (err) return reject(err);
+      console.log("results from addtocart prompt", results)
       resolve(results);
     })
   });
