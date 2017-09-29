@@ -150,6 +150,7 @@ let customerMenuHandler = (err, userInput) => {
         deleteProduct(productObj.productId)
         .then( (result) => {
          console.log('this product has been deleted'); 
+         printAllCustomers();
         })
         .catch((err) => {
          console.log("delete product error", err)
