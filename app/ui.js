@@ -12,12 +12,14 @@ prompt.message = colors.blue("Bangazon Corp");
 const { promptNewCustomer } = require('./controllers/customerCtrl');
 const { postUserObj, getAllUsers } = require('./models/Customer');
 const { getActiveCustomer, setActiveCustomer } = require('./activeCustomer');
+const { addToCartStart, addToCart } = require('./controllers/orderCtrl');
 const { newProductPrompt, deleteProdPrompt } = require('./controllers/productCtrl')
 const { postNewProduct, deletableProducts, deleteProduct } = require('./models/Product')
 
 const db = new Database(path.join(__dirname, '..', 'db', 'bangazon.sqlite'));
 
 let date = new Date;
+
 
 prompt.start();
 
@@ -69,7 +71,7 @@ let mainMenuHandler = (err, userInput) => {
 };
 
 let printAllCustomers = () => {
-let headerDivider = `${magenta('*********************************************************')}`
+  let headerDivider = `${magenta('*********************************************************')}`
   console.log(`
   ${headerDivider}
   ${magenta(`**  Bangazon Customer Menu  **`)}
@@ -83,15 +85,15 @@ let headerDivider = `${magenta('************************************************
   ${magenta('7.')} See product popularity
   ${magenta('8.')} Return to the main menu
   ${magenta('9.')} Leave Bangazon!`);
-    prompt.get([{
-      name: 'choice',
-      description: 'Please make a selection'
-    }], customerMenuHandler );
+  prompt.get([{
+    name: 'choice',
+    description: 'Please make a selection'
+  }], customerMenuHandler );
 }
 
 let customerMenuHandler = (err, userInput) => {
   console.log(`You are currently working with customer id ${getActiveCustomer().id}`);
-
+  
   // This could get messy quickly. Maybe a better way to parse the input?
   if(userInput.choice == '1') {
     createPaymentPrompt()
@@ -100,14 +102,25 @@ let customerMenuHandler = (err, userInput) => {
       //run post payment function and return to menu
     });   
   } else if (userInput.choice == '2') {
-    addToCartPrompt()
-    .then( (cartItem) => {
-      console.log('item added to cart:', cartItem);
-      //run post item to cart function
-    })
-  } else if (userInput.choice == '3') {
-    module.exports.displayOrder();
-  } else if (userInput.choice == '4') {
+    addToCartStart()
+    .then( (prodObjs) => {
+      if(prodObjs.length === 0) {
+        console.log("No Products Available")
+        printAllCustomers()
+      } else {
+      displayProducts(prodObjs);
+      addToCartPrompt()
+      .then( (data) => {
+        addToCart(data.Product, prodObjs, getActiveCustomer().id)
+        .then( () => {
+          printAllCustomers()
+        });
+      })
+    }
+    });
+    } else if (userInput.choice == '3') {
+      module.exports.displayOrder();
+    } else if (userInput.choice == '4') {
     newProductPrompt()
     .then( (newProduct) => {
       newProduct.seller_id = Number(getActiveCustomer().id);
@@ -121,15 +134,16 @@ let customerMenuHandler = (err, userInput) => {
           console.log("new product error", err);
       });
     });
+
   } else if (userInput.choice == '5') {
     productPopPrompt()
     .then( (updatedProd) => {
       console.log(`
-        ${magenta('1.')} Product Name
-        ${magenta('2.')} Product Description
-        ${magenta('3.')} Product Price
-        ${magenta('4.')} Product Type Id
-        ${magenta('5.')} Quantity Available
+      ${magenta('1.')} Product Name
+      ${magenta('2.')} Product Description
+      ${magenta('3.')} Product Price
+      ${magenta('4.')} Product Type Id
+      ${magenta('5.')} Quantity Available
         ${magenta('6.')} Return to Customer Menu`)
         prompt.get([{
           name: 'choice',
@@ -190,36 +204,48 @@ let activeCustomerPrompt = () => {
         }], function(err, results) {
           if (err) return reject(err);
           resolve(results);
+        })
       })
     })
-  })
-};
-
-let createPaymentPrompt = () => {
-  return new Promise( (resolve, reject) => {
-    prompt.get([{
-      name: 'paymentName',
-      description: "Enter the payment option name",
-      type: 'string',
-      required: true
-    },
-    {
-      name: 'accountNum',
-      description: "Enter the account number",
-      type: 'number',
-      required: true
-    }], function(err, results) {
-      if (err) return reject(err);
-      resolve(results);
-    })
+  };
+  
+  let createPaymentPrompt = () => {
+    return new Promise( (resolve, reject) => {
+      prompt.get([{
+        name: 'paymentName',
+        description: "Enter the payment option name",
+        type: 'string',
+        required: true
+      },
+      {
+        name: 'accountNum',
+        description: "Enter the account number",
+        type: 'number',
+        required: true
+      }], function(err, results) {
+        if (err) return reject(err);
+        resolve(results);
+      })
   });
 };
+
+//DISPLAY PRODUCTS: takes any array of objects and displays them numberically (1, 2, 3...) -jmr
+let displayProducts = (prodObjs) => {
+  let headerDivider = `${magenta('*********************************************************')}`
+  console.log(`
+  ${headerDivider}
+  ${magenta(`**  Bangazon Products  **`)}
+  ${headerDivider}`);
+  prodObjs.forEach( (prod, i) => {
+      console.log(`${magenta(`${i + 1}. `)}${prod.Name}`)
+  });
+}
 
 let addToCartPrompt = () => {
   return new Promise( (resolve, reject) => {
     prompt.get([{
-      name: 'productId',
-      description: "Enter the product Id",
+      name: 'Product',
+      description: "Enter the product",
       type: 'number',
       required: true
     }], function(err, results) {

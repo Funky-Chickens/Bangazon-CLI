@@ -12,10 +12,10 @@
         "payment_type": "2"
     },
     {
-        "buyer_id": "7",
+        "buyer_id": "1",
         "order_date": "Wed May 17 2017 18:47:24 GMT-0500 (CDT)",
         "order_id": "20",
-        "payment_type": "2"
+        "payment_type": null
     },
     {
         "buyer_id": "4",
