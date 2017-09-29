@@ -53,4 +53,15 @@ let deleteProduct = (productId) => {
     });
 };
 
-module.exports = { getAllUserProducts, postNewProduct, deletableProducts, deleteProduct };
+let getSellerProduct  = ( id) => {
+        return new Promise( (resolve, reject) => {//select product by product id
+            db.get(`SELECT *
+                FROM products
+                WHERE seller_id = ${id} AND product_id = 2`, (err, user)=>{
+                    if (err) return reject(err);
+                    resolve(user);
+                });
+        });
+};
+
+module.exports = { getAllUserProducts, postNewProduct, deletableProducts, deleteProduct, getSellerProduct};
