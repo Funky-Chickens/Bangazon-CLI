@@ -16,6 +16,7 @@ let getAllUserProducts = (id) => {
                 resolve(prods);
             } else {
                 console.log("no products available");
+                //need resolve here?
             }
         });
     });
@@ -77,5 +78,6 @@ let getSellerProduct  = ( id) => {
                 });
         });
 };
+
 
 module.exports = { getAllUserProducts, getAllProducts, postNewProduct, deletableProducts, deleteProduct, getSellerProduct};

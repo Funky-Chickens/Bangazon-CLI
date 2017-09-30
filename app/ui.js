@@ -13,8 +13,8 @@ const { promptNewCustomer } = require('./controllers/customerCtrl');
 const { postUserObj, getAllUsers } = require('./models/Customer');
 const { getActiveCustomer, setActiveCustomer } = require('./activeCustomer');
 const { addToCartStart, addToCart } = require('./controllers/orderCtrl');
-const { newProductPrompt, deleteProdPrompt } = require('./controllers/productCtrl')
-const { postNewProduct, deletableProducts, deleteProduct } = require('./models/Product')
+const { newProductPrompt, deleteProdPrompt, showAllProducts, productUpdateMenu, selectProduct } = require('./controllers/productCtrl')
+const { getAllUserProducts, getAllProducts, postNewProduct, deletableProducts, deleteProduct, getSellerProduct } = require('./models/Product')
 
 const db = new Database(path.join(__dirname, '..', 'db', 'bangazon.sqlite'));
 
@@ -52,7 +52,7 @@ let mainMenuHandler = (err, userInput) => {
       })
       .catch( (err) => {
         console.log("errormagherd", err);
-      }); 
+      });
       //-ladies
     });
   } else if (userInput.choice == '2'){
@@ -136,22 +136,25 @@ let customerMenuHandler = (err, userInput) => {
     });
 
   } else if (userInput.choice == '5') {
-    productPopPrompt()
-    .then( (updatedProd) => {
-      console.log(`
-      ${magenta('1.')} Product Name
-      ${magenta('2.')} Product Description
-      ${magenta('3.')} Product Price
-      ${magenta('4.')} Product Type Id
-      ${magenta('5.')} Quantity Available
-        ${magenta('6.')} Return to Customer Menu`)
-        prompt.get([{
-          name: 'choice',
-          description: 'Please make a selection'
-        }], productMenuHandler );
-      // console.log('these changes have been made to the product:', updatedProd);
-      //run function to update product information
+    showAllProducts(getActiveCustomer().id)//from productCtrl
+    .then( (prodObjs) => {
+      displayProducts(prodObjs)
+      updateProductPrompt()
+      .then( (results) => {
+        selectProduct(results.choice, prodObjs, getActiveCustomer().id)
+        .then( (productId) =>{
+          console.log(`You selected product ${productId.product_id}, ${productId.Name}`);
+          console.log('Please choose what you would like to change:')
+          //next prompt here - product update menu in product ctrl
+          productUpdateMenu()
+          .then( (propertyToUpdate) =>{
+            console.log("Choice of propertyToUpdate", propertyToUpdate)
+          })
+        })
+      })
     })
+      //  console.log('these changes have been made to the product:', updatedProd);
+      //run function to update product information
   } else if (userInput.choice == '6') {
     deletableProducts(Number(getActiveCustomer().id))
     .then( (results) => {
@@ -404,3 +407,15 @@ let productQtyPrompt = () => {
     })
   });
 };
+
+let updateProductPrompt = () => {
+  return new Promise( (resolve, reject) => {
+    prompt.get([{
+      name: 'choice',
+      description: 'Please make a selection'
+    }], function(err, results){
+      if (err) return reject (err)
+        resolve(results);
+    })
+  })
+}

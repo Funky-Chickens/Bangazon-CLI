@@ -1,6 +1,7 @@
 'use strict';
-
+const {red, magenta, blue} = require("chalk");
 const prompt = require('prompt');
+const { getAllUserProducts, getAllProducts, postNewProduct, deletableProducts, deleteProduct, getSellerProduct }= require('../models/Product');
 // const { getActiveCustomer } = require('../activeCustomer');
 
 module.exports.newProductPrompt = () => {
@@ -55,16 +56,66 @@ module.exports.deleteProdPrompt = () => {
   });
 };
 
-let productPopPrompt = () => {
+module.exports.showAllProducts = (userId) => {
   return new Promise( (resolve, reject) => {
-    prompt.get([{
-      name: 'productId',
-      description: "Enter the product Id",
-      type: 'number',
-      required: true
-    }], function(err, results) {
-      if (err) return reject(err);
-      resolve(results);
-    })
+      getAllUserProducts(userId)
+      .then( (prodObjs) => {
+        resolve(prodObjs);
+      });
   });
-};
+}
+
+let getProductIds = (prodObjs) => {
+  let prodIds = prodObjs.map( (prod) => {
+      return prod.product_id;
+  });
+  return prodIds
+}
+
+let productSelectMatch = (prodIds, selection) => {
+  let productToUpdate = prodIds[selection -1];
+  if (productToUpdate) return productToUpdate
+}
+
+module.exports.selectProduct = (selection, prodObjs, userId) => {
+  return new Promise( (resolve, reject) => {
+    let productIds = getProductIds(prodObjs);
+    let prodUpdate = productSelectMatch(prodObjs, selection);
+    resolve(prodUpdate)
+  })
+}
+
+module.exports.productUpdateMenu = () => {
+  return new Promise( (resolve, reject) => {
+    console.log(`
+      ${magenta('1.')} Product Name
+      ${magenta('2.')} Product Description
+      ${magenta('3.')} Product Price
+      ${magenta('4.')} Product Type Id
+      ${magenta('5.')} Quantity Available
+      ${magenta('6.')} Return to Customer Menu`)
+    prompt.get([{
+    name:'choice',
+    description:'Select a number:',
+    type:'number',
+    required:true
+  }], function(err, results){
+    if (err) return reject(err);
+    resolve(results);
+ })
+})
+}
+
+// let productPopPrompt = () => {
+//   return new Promise( (resolve, reject) => {
+//     prompt.get([{
+//       name: 'productId',
+//       description: "Enter the product Id",
+//       type: 'number',
+//       required: true
+//     }], function(err, results) {
+//       if (err) return reject(err);
+//       resolve(results);
+//     })
+//   });
+// };

@@ -7,7 +7,7 @@ const { buildProductsDB } = require('../db/build-db.js');
 describe('Product', () => {
   before( function(done) {
     buildProductsDB()
-    .then( () => done()); 
+    .then( () => done());
   });
     describe('Get User Products', () => {
         it('should be a function', () => isFunction(getAllUserProducts, 'Function?'));
