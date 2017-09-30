@@ -68,11 +68,11 @@ let deleteProduct = (productId) => {
     });
 };
 
-let getSellerProduct  = ( id) => {
+let getSellerProduct  = (id, prodId) => {
         return new Promise( (resolve, reject) => {//select product by product id
             db.get(`SELECT *
                 FROM products
-                WHERE seller_id = ${id} AND product_id = 2`, (err, user)=>{
+                WHERE seller_id = ${id} AND product_id = ${prodId}`, (err, user)=>{
                     if (err) return reject(err);
                     resolve(user);
                 });

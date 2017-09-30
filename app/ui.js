@@ -145,7 +145,6 @@ let customerMenuHandler = (err, userInput) => {
         .then( (productId) =>{
           console.log(`You selected product ${productId.product_id}, ${productId.Name}`);
           console.log('Please choose what you would like to change:')
-          //next prompt here - product update menu in product ctrl
           productUpdateMenu()
           .then( (propertyToUpdate) =>{
             console.log("Choice of propertyToUpdate", propertyToUpdate)
