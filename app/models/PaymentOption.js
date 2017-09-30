@@ -33,6 +33,21 @@ let addPaymentToOrder = (paymentId, id) => {
     });
 };
 
+let checkForOpenOrder = (id) => {
+    return new Promise( (resolve, reject) => {
+        db.all(`SELECT buyer_id, payment_type FROM orders
+        WHERE payment_type IS NULL AND buyer_id = ${id}`, function (err, object){
+            if (err) return reject(err);
+            if (object.length > 0){
+            resolve(object);
+            }
+            else {
+                console.log("Sorry, you dont have any open orders");
+                resolve(err);
+            }
+        });
+    });
+}
 
 
-module.exports = { postPaymentOption, getUsersPaymentOptions, addPaymentToOrder };
+module.exports = { postPaymentOption, getUsersPaymentOptions, addPaymentToOrder, checkForOpenOrder };

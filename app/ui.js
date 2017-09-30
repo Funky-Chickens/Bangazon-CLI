@@ -288,20 +288,6 @@ let orderMenuHandler = (err, userInput) => {
   }
 };
 
-let completeOrderPrompt = () => {
-  return new Promise( (resolve, reject) => {
-    prompt.get([{
-      name: 'paymentId',
-      description: "Enter the payment Id",
-      type: 'number',
-      required: true
-    }], function(err, results) {
-      if (err) return reject(err);
-      resolve(results);
-    })
-  });
-};
-
 let productMenuHandler = (err, userInput) => {
   console.log("user input", userInput);
   // This could get messy quickly. Maybe a better way to parse the input?

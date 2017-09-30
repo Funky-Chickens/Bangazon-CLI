@@ -35,4 +35,26 @@ let createPaymentPrompt = () => {
       });
   }
 
+
+  let completeOrderPrompt = () => {
+    return new Promise( (resolve, reject) => {
+      prompt.get([{
+        name: 'paymentId',
+        description: "Enter the payment Id",
+        type: 'number',
+        required: true
+      }], function(err, results) {
+        if (err) return reject(err);
+        resolve(results);
+      })
+    });
+  };
+
+  let completeOrderWithPayment = () => {
+    return new Promise( (resolve, reject) => {
+      completeOrderPrompt(). then((results) => {
+      });
+    });
+  }
+
 module.exports= { getPayment };
