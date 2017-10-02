@@ -1,4 +1,4 @@
-'use strict';
+'use strict'; 
 const { Database } = require('sqlite3').verbose();
 const { setActiveCustomer, getActiveCustomer } = require('../activeCustomer');
 const path = require('path');
@@ -10,7 +10,7 @@ let postPaymentOption = (buyerId, paymentType, acctNumber) => {
     return new Promise( (resolve, reject) => {
         db.run(`INSERT into paymentOptions VALUES (null, ${buyerId}, "${paymentType}", ${acctNumber})`, function (err) {
                 if (err) return reject(err);
-                resolve();
+                resolve(this.changes);
         });
     });
 };
@@ -33,13 +33,17 @@ let addPaymentToOrder = (paymentId, id) => {
     });
 };
 
-let checkForOpenOrder = (id) => {
+//want to get the prices of all the products on a user's open order only - el/cm
+let checkForOpenOrderToAddPayment = (id) => {
     return new Promise( (resolve, reject) => {
-        db.all(`SELECT buyer_id, payment_type FROM orders
-        WHERE payment_type IS NULL AND buyer_id = ${id}`, function (err, object){
+        db.all(`SELECT price from products, productOrders, orders
+            WHERE products.product_id = productOrders.prod_id
+            AND orders.order_id = productOrders.order_id
+            AND orders.payment_type IS NULL 
+            AND orders.buyer_id = ${id}`, function (err, prodsArr){
             if (err) return reject(err);
-            if (object.length > 0){
-            resolve(object);
+            if (prodsArr.length > 0){
+            resolve(prodsArr);
             }
             else {
                 console.log("Sorry, you dont have any open orders");
@@ -49,6 +53,8 @@ let checkForOpenOrder = (id) => {
     });
 }
 
+
+
 let getOrderTotal = (id) => {
     return new Promise( (resolve, reject) => {
         db.all(`SELECT `)
@@ -56,4 +62,4 @@ let getOrderTotal = (id) => {
 }
 
 
-module.exports = { postPaymentOption, getUsersPaymentOptions, addPaymentToOrder, checkForOpenOrder };
+module.exports = { postPaymentOption, getUsersPaymentOptions, addPaymentToOrder, checkForOpenOrderToAddPayment };

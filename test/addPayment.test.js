@@ -1,4 +1,4 @@
-'use strict';
+'use strict'; 
 require('dotenv').config();
 let TIMEOUT = process.env.TIMEOUT;
 const chai = require("chai");
@@ -23,7 +23,9 @@ describe('PaymentOptions', () => {
         }; 
         it('should be a function', () => isFunction(postPaymentOption, "postPaymentOption is a function"));
         it('should post the payment object the user created', () => {
-        return postPaymentOption(49, "visa", 77788899).then( () => {
+            return postPaymentOption(49, "visa", 77788899)
+            .then( (changes) => {
+                equal(changes, 1);
             }); 
         });
     });
@@ -31,6 +33,7 @@ describe('PaymentOptions', () => {
         it('Should be a function', () => isFunction(checkForOpenOrder, 'Function?'));
         it('Should be able to retrieve an order with no payment type', () => {
             return checkForOpenOrder(2).then( (result) => {
+                isObject(result);
                 console.log("RESULT?", result);
             });
         });
@@ -38,8 +41,9 @@ describe('PaymentOptions', () => {
     describe('GET function', () => {
         it('should be a function', () => isFunction(getUsersPaymentOptions, "getUsersPaymentOptions is a function"));
         it('should get the object containing users payment options', () => {
-        return getUsersPaymentOptions(2).then( () => { 
-             }); 
+        return getUsersPaymentOptions(2).then( (results) => { 
+            isObject(results);
+            }); 
         });
     });
     describe('POST function', () => {

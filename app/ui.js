@@ -15,7 +15,7 @@ const { getActiveCustomer, setActiveCustomer } = require('./activeCustomer');
 const { addToCartStart, addToCart } = require('./controllers/orderCtrl');
 const { newProductPrompt, deleteProdPrompt } = require('./controllers/productCtrl')
 const { postNewProduct, deletableProducts, deleteProduct } = require('./models/Product')
-const { getPayment } = require('./controllers/paymentCtrl')
+const { getPayment,completeOrderWithPayment, completeOrderPrompt, calcOrderTotal } = require('./controllers/paymentCtrl')
 
 const db = new Database(path.join(__dirname, '..', 'db', 'bangazon.sqlite'));
 
@@ -260,19 +260,26 @@ let addToCartPrompt = () => {
   });
 };
 
-module.exports.displayOrder = (total) => {
-  console.log('Your order total is', total, 'Ready to purchase (Y/N)  **');
+//edited to call functions in correct order to get the calculated order total - el/cm
+module.exports.displayOrder = () => {
+  let uid = Number(getActiveCustomer().id);
+  completeOrderWithPayment(uid)
+  .then ( (results) => {
+    let total = calcOrderTotal(results);
+  console.log(`Your order total is $${total}.   Ready to purchase? (Y/N), 3 to exit  **`);
     prompt.get([{
       name: 'choice',
       description: 'Please make a selection'
     }], orderMenuHandler );
+  });
 };
 
 let orderMenuHandler = (err, userInput) => {
   console.log("user input", userInput);
   // This could get messy quickly. Maybe a better way to parse the input?
   if(userInput.choice == 'Y') {
-      completeOrderPrompt()
+    //Before we can launch complete order prompt, we need to display all the user's payment options
+      completeOrderPrompt(Number(getActiveCustomer().id)) //imported from paymentCtrl.js
     .then( (completeOrder) => {
       console.log('this order is completed:', completeOrder);
       //run post payment to order function
