@@ -8,7 +8,7 @@ const db = new Database(dbPath);
 
 let getAllUserProducts = (id) => {
     return new Promise( (resolve, reject) => {
-        db.all(`SELECT products.product_id, products.seller_id, products.product_name AS "Name" FROM users 
+        db.all(`SELECT products.product_id, products.seller_id, products.product_name AS "Name", products.description, products.price, products.quantity_avail, products.product_type_id FROM users 
         JOIN products where products.seller_id = users.user_id AND products.seller_id = ${id}
     `, (err, prods) => {
             if (err) return reject(err);
@@ -72,12 +72,22 @@ let getSellerProduct  = (id, prodId) => {
         return new Promise( (resolve, reject) => {//select product by product id
             db.get(`SELECT *
                 FROM products
-                WHERE seller_id = ${id} AND product_id = ${prodId}`, (err, user)=>{
+                WHERE seller_id = ${id} AND product_id = ${prodId}`, (err, prodObj)=>{
                     if (err) return reject(err);
-                    resolve(user);
+                    resolve(prodObj);
                 });
         });
 };
 
+let updateProduct = (tableString, value, product_Id, sellerId) => {
+    return new Promise( (resolve, reject) => {
+        console.log("updateProduct in model", tableString, value, product_Id, sellerId)
+        db.run(`UPDATE products set ${tableString} = "${value}" WHERE seller_id = ${sellerId}  AND product_id = ${product_Id}`, (err) => {
+            if (err) return reject(err);
+            resolve();
+        })
+    })
+}
 
-module.exports = { getAllUserProducts, getAllProducts, postNewProduct, deletableProducts, deleteProduct, getSellerProduct};
+
+module.exports = { getAllUserProducts, getAllProducts, postNewProduct, deletableProducts, deleteProduct, getSellerProduct, updateProduct};

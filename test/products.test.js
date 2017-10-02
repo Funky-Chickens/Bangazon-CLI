@@ -1,7 +1,8 @@
 'use strict';
 
-const { assert: {equal, isFunction, isObject, isArray, isNumber, notExists} } = require('chai');
-const { getAllUserProducts, getAllProducts, postNewProduct, deletableProducts, deleteProduct, getSellerProduct } = require('../app/models/Product.js');
+const { assert: {equal, deepEqual, isFunction, isObject, isArray, isNumber, notExists} } = require('chai');
+const { getAllUserProducts, getAllProducts, postNewProduct, deletableProducts, deleteProduct, getSellerProduct, UpdateProduct } = require('../app/models/Product.js');
+const { productUpdate } = require('../app/controllers/productCtrl');
 const { buildProductsDB } = require('../db/build-db.js');
 
 describe('Product', () => {
@@ -63,6 +64,20 @@ describe('Product', () => {
             return getSellerProduct(2, 6)
             .then( (result) => {
                 notExists(result);
+            });
+        });
+    });
+    describe('Update Products for seller', () => {
+        let value = "random string";
+        let tableString = "description"
+        it('should be a function', () => isFunction(productUpdate, 'Function?'));
+        it('it should return product obj', () => {
+            return productUpdate(tableString, value, 1, 1)
+            .then( (results) => {
+                return getSellerProduct(1,1)
+                .then( (sellerprod) =>{
+                    equal(sellerprod.description, value);
+                })
             });
         });
     });

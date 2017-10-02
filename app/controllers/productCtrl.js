@@ -1,7 +1,7 @@
 'use strict';
 const {red, magenta, blue} = require("chalk");
 const prompt = require('prompt');
-const { getAllUserProducts, getAllProducts, postNewProduct, deletableProducts, deleteProduct, getSellerProduct }= require('../models/Product');
+const { getAllUserProducts, getAllProducts, postNewProduct, deletableProducts, deleteProduct, getSellerProduct, updateProduct }= require('../models/Product');
 // const { getActiveCustomer } = require('../activeCustomer');
 
 module.exports.newProductPrompt = () => {
@@ -85,14 +85,14 @@ module.exports.selectProduct = (selection, prodObjs, userId) => {
   })
 }
 
-module.exports.productUpdateMenu = () => {
+module.exports.productUpdateMenu = (prodObj) => {
   return new Promise( (resolve, reject) => {
     console.log(`
-      ${magenta('1.')} Product Name
-      ${magenta('2.')} Product Description
-      ${magenta('3.')} Product Price
-      ${magenta('4.')} Product Type Id
-      ${magenta('5.')} Quantity Available
+      ${magenta('1.')} Product Name "${prodObj.Name}"
+      ${magenta('2.')} Product Description "${prodObj.description}"
+      ${magenta('3.')} Product Price "${prodObj.price}"
+      ${magenta('4.')} Product Type Id "${prodObj.product_type_id}"
+      ${magenta('5.')} Quantity Available "${prodObj.quantity_avail}"
       ${magenta('6.')} Return to Customer Menu`)
     prompt.get([{
     name:'choice',
@@ -101,21 +101,10 @@ module.exports.productUpdateMenu = () => {
     required:true
   }], function(err, results){
     if (err) return reject(err);
-    resolve(results);
+    resolve(results); //resolves choice #
  })
 })
 }
 
-// let productPopPrompt = () => {
-//   return new Promise( (resolve, reject) => {
-//     prompt.get([{
-//       name: 'productId',
-//       description: "Enter the product Id",
-//       type: 'number',
-//       required: true
-//     }], function(err, results) {
-//       if (err) return reject(err);
-//       resolve(results);
-//     })
-//   });
-// };
+module.exports.productUpdate= updateProduct; //use as intermediary
+

@@ -13,7 +13,7 @@ const { promptNewCustomer } = require('./controllers/customerCtrl');
 const { postUserObj, getAllUsers } = require('./models/Customer');
 const { getActiveCustomer, setActiveCustomer } = require('./activeCustomer');
 const { addToCartStart, addToCart } = require('./controllers/orderCtrl');
-const { newProductPrompt, deleteProdPrompt, showAllProducts, productUpdateMenu, selectProduct } = require('./controllers/productCtrl')
+const { newProductPrompt, deleteProdPrompt, showAllProducts, productUpdateMenu, selectProduct, productUpdate } = require('./controllers/productCtrl')
 const { getAllUserProducts, getAllProducts, postNewProduct, deletableProducts, deleteProduct, getSellerProduct } = require('./models/Product')
 
 const db = new Database(path.join(__dirname, '..', 'db', 'bangazon.sqlite'));
@@ -142,12 +142,12 @@ let customerMenuHandler = (err, userInput) => {
       updateProductPrompt()
       .then( (results) => {
         selectProduct(results.choice, prodObjs, getActiveCustomer().id)
-        .then( (productId) =>{
-          console.log(`You selected product ${productId.product_id}, ${productId.Name}`);
+        .then( (productObj) =>{
+          console.log(`You selected product ${productObj.product_id}, ${productObj.Name}`);
           console.log('Please choose what you would like to change:')
-          productUpdateMenu()
+          productUpdateMenu(productObj)
           .then( (propertyToUpdate) =>{
-            console.log("Choice of propertyToUpdate", propertyToUpdate)
+            productMenuHandler(propertyToUpdate, productObj)
           })
         })
       })
@@ -299,41 +299,53 @@ let completeOrderPrompt = () => {
   });
 };
 
-let productMenuHandler = (err, userInput) => {
+let productMenuHandler = (userInput, prodObj) => {
   console.log("user input", userInput);
-  // This could get messy quickly. Maybe a better way to parse the input?
   if(userInput.choice == '1') {
-      productNamePrompt()
-    .then( (productName) => {
-      console.log('this product name has been updated:', productName);
-      //run post payment to order function
+    let prodName = "product_name";
+    productNamePrompt()
+    .then( (newProdName) => {
+      console.log("product id?", prodObj.product_id)
+      productUpdate(prodName, newProdName.productName, prodObj.product_id, prodObj.seller_id)
+      .then( ()=>{
+        console.log('This product name has been updated:', newProdName.productName);
+      })
     });
   } else if (userInput.choice == '2'){
+    let prodDesc = "description";
     productDescPrompt()
-    .then( (productDesc) => {
-      console.log('this description has been updated:', productDesc)
-      //run active customer function that opens the customerMenuHandler
+    .then( (newProdDescription) => {
+      productUpdate(prodDesc, newProdDescription.productDesc, prodObj.product_id, prodObj.seller_id)
+      .then( ()=>{
+        console.log('This product description has been updated:', newProdDescription.productDesc);
+      })
     });
   } else if (userInput.choice == '3'){
+    let prodPrice = "price";
     productPricePrompt()
-    .then( (productPrice) => {
-      console.log('this product price has been updated:', productPrice)
+    .then( (newProductPrice) => {
+      productUpdate(prodPrice, newProductPrice.productPrice, prodObj.product_id, prodObj.seller_id)
+      console.log('This product price has been updated:', newProductPrice.productPrice)
       //run active customer function that opens the customerMenuHandler
     });
   } else if (userInput.choice == '4'){
+    let prodType = "product_type_id";
     productTypePrompt()
-    .then( (productType) => {
-      console.log('this product type has been updated:', productType)
+    .then( (newProductType) => {
+      productUpdate(prodType, newProductType.productType, prodObj.product_id, prodObj.seller_id)
+      console.log('This product type has been updated:', newProductType.productType)
       //run active customer function that opens the customerMenuHandler
     });
   } else if (userInput.choice == '5'){
+    let prodQty = "quantity_avail";
     productQtyPrompt()
-    .then( (productQty) => {
-      console.log('this product quantity has been updated:', productQty)
+    .then( (newProductQty) => {
+      productUpdate(prodQty, newProductQty.productQty, prodObj.product_id, prodObj.seller_id)
+      console.log('this product quantity has been updated:', newProductQty.productQty)
       //run active customer function that opens the customerMenuHandler
     });
   } else if (userInput.choice == '6') {
-    prompt.stop();
+    prompt.stop();//need to return to previous menu here instead of kicking us out
   }
 };
 
@@ -346,6 +358,7 @@ let productNamePrompt = () => {
       required: true
     }], function(err, results) {
       if (err) return reject(err);
+      console.log("results product name prompt", results);
       resolve(results);
     })
   });
