@@ -13,8 +13,8 @@ const { promptNewCustomer } = require('./controllers/customerCtrl');
 const { postUserObj, getAllUsers } = require('./models/Customer');
 const { getActiveCustomer, setActiveCustomer } = require('./activeCustomer');
 const { addToCartStart, addToCart } = require('./controllers/orderCtrl');
-const { newProductPrompt, deleteProdPrompt } = require('./controllers/productCtrl')
-const { postNewProduct, deletableProducts, deleteProduct } = require('./models/Product')
+const { newProductPrompt, deleteProdPrompt, showAllProducts, productUpdateMenu, selectProduct, productUpdate } = require('./controllers/productCtrl')
+const { getAllUserProducts, getAllProducts, postNewProduct, deletableProducts, deleteProduct, getSellerProduct } = require('./models/Product')
 
 const db = new Database(path.join(__dirname, '..', 'db', 'bangazon.sqlite'));
 
@@ -23,7 +23,7 @@ let date = new Date;
 
 prompt.start();
 
-module.exports.displayWelcome = () => {
+module.exports.displayWelcome = () => {//first menu
   let headerDivider = `${magenta('*********************************************************')}`
   console.log(`
   ${headerDivider}
@@ -39,7 +39,6 @@ module.exports.displayWelcome = () => {
 };
 
 let mainMenuHandler = (err, userInput) => {
-  // This could get messy quickly. Maybe a better way to parse the input?
   if(userInput.choice == '1') {
     promptNewCustomer() //in customerCtrl.js
     .then( (custData) => {
@@ -48,11 +47,11 @@ let mainMenuHandler = (err, userInput) => {
       postUserObj(custData) //in Customer.js
       .then( (result) => {
         console.log("This new customer was saved with the ID: ", result);
-        module.exports.displayWelcome();
+        module.exports.displayWelcome();//back to first menu
       })
       .catch( (err) => {
         console.log("errormagherd", err);
-      }); 
+      });
       //-ladies
     });
   } else if (userInput.choice == '2'){
@@ -70,7 +69,7 @@ let mainMenuHandler = (err, userInput) => {
   }
 };
 
-let printAllCustomers = () => {
+let printAllCustomers = () => {//main menu
   let headerDivider = `${magenta('*********************************************************')}`
   console.log(`
   ${headerDivider}
@@ -91,18 +90,15 @@ let printAllCustomers = () => {
   }], customerMenuHandler );
 }
 
-let customerMenuHandler = (err, userInput) => {
-  console.log(`You are currently working with customer id ${getActiveCustomer().id}`);
-  
-  // This could get messy quickly. Maybe a better way to parse the input?
+let customerMenuHandler = (err, userInput) => {//handles main menu input
   if(userInput.choice == '1') {
-    createPaymentPrompt()
+    createPaymentPrompt() //brings up prompt to add a payment option
     .then( (paymentData) => {
       console.log('payment data to save:', paymentData);
       //run post payment function and return to menu
-    });   
+    });
   } else if (userInput.choice == '2') {
-    addToCartStart()
+    addToCartStart()//add product to shopping cart
     .then( (prodObjs) => {
       if(prodObjs.length === 0) {
         console.log("No Products Available")
@@ -118,9 +114,9 @@ let customerMenuHandler = (err, userInput) => {
       })
     }
     });
-    } else if (userInput.choice == '3') {
+    } else if (userInput.choice == '3') {//complete order
       module.exports.displayOrder();
-    } else if (userInput.choice == '4') {
+    } else if (userInput.choice == '4') {//add product to sell
     newProductPrompt()
     .then( (newProduct) => {
       newProduct.seller_id = Number(getActiveCustomer().id);
@@ -135,35 +131,43 @@ let customerMenuHandler = (err, userInput) => {
       });
     });
 
-  } else if (userInput.choice == '5') {
-    productPopPrompt()
-    .then( (updatedProd) => {
-      console.log(`
-      ${magenta('1.')} Product Name
-      ${magenta('2.')} Product Description
-      ${magenta('3.')} Product Price
-      ${magenta('4.')} Product Type Id
-      ${magenta('5.')} Quantity Available
-        ${magenta('6.')} Return to Customer Menu`)
-        prompt.get([{
-          name: 'choice',
-          description: 'Please make a selection'
-        }], productMenuHandler );
-      // console.log('these changes have been made to the product:', updatedProd);
+  } else if (userInput.choice == '5') {//update seller product information
+    showAllProducts(getActiveCustomer().id)//from productCtrl, show all of active user's products
+    .then( (prodObjs) => {//if user has products, display them, if not, display error and take back to handler
+     if(prodObjs) {
+      displayProducts(prodObjs);
+      updateProductPrompt()//prompt user to choose what product to modify from a numbered list (doesn't necessarily correspond to id of product object)
+      .then( (results) => {
+        selectProduct(results.choice, prodObjs, getActiveCustomer().id)//use user input, the product object, and the active customer id to
+        // select that product by matching its id rather than just using user input number(see controller)
+        .then( (productObj) => {
+          console.log(`You selected product ${productObj.product_id}, ${productObj.Name}`);
+          console.log('Please choose what you would like to change:')
+          productUpdateMenu(productObj)//see controller- this uses the product object to populate menu of choices of what property to change
+          //on that object
+          .then( (propertyToUpdate) =>{//propertyToUpdate = user input on what to change
+            productMenuHandler(propertyToUpdate, productObj)//brings up productMenuHandler in this file that takes over from here
+          });
+        });
+      });
+    } else {
+        printAllCustomers();
+    }
+  });
+      //  console.log('these changes have been made to the product:', updatedProd);
       //run function to update product information
-    })
-  } else if (userInput.choice == '6') {
+  } else if (userInput.choice == '6') {//delete a seller product
     deletableProducts(Number(getActiveCustomer().id))
     .then( (results) => {
       results.forEach( (item) => {
-        console.log("deletable products: ");
+        console.log("Deletable products: ");
         console.log(item.product_id, item.product_name);
       })
       deleteProdPrompt()
       .then( (productObj) => {
         deleteProduct(productObj.productId)
         .then( (result) => {
-         console.log('this product has been deleted'); 
+         console.log('This product has been deleted.');
          printAllCustomers();
         })
         .catch((err) => {
@@ -175,7 +179,6 @@ let customerMenuHandler = (err, userInput) => {
     .catch((err) => {
       console.log("deletable products error", err);
     })
-    
   } else if (userInput.choice == '7') {
     productPopPrompt()
     .then( (productPop) => {
@@ -185,6 +188,7 @@ let customerMenuHandler = (err, userInput) => {
   } else if (userInput.choice == '8') {
     module.exports.displayWelcome();
   } else if (userInput.choice == '9') {
+    console.log('Thank you for visiting Bangazon.  Goodbye.')
     prompt.stop();
   }
 };
@@ -208,7 +212,7 @@ let activeCustomerPrompt = () => {
       })
     })
   };
-  
+
   let createPaymentPrompt = () => {
     return new Promise( (resolve, reject) => {
       prompt.get([{
@@ -229,7 +233,7 @@ let activeCustomerPrompt = () => {
   });
 };
 
-//DISPLAY PRODUCTS: takes any array of objects and displays them numberically (1, 2, 3...) -jmr
+//DISPLAY PRODUCTS: takes any array of objects and displays them numerically (1, 2, 3...) -jmr
 let displayProducts = (prodObjs) => {
   let headerDivider = `${magenta('*********************************************************')}`
   console.log(`
@@ -264,18 +268,17 @@ module.exports.displayOrder = (total) => {
 };
 
 let orderMenuHandler = (err, userInput) => {
-  console.log("user input", userInput);
   // This could get messy quickly. Maybe a better way to parse the input?
   if(userInput.choice == 'Y') {
       completeOrderPrompt()
     .then( (completeOrder) => {
-      console.log('this order is completed:', completeOrder);
+      console.log('This order is completed:', completeOrder);
       //run post payment to order function
     });
   } else if (userInput.choice == 'N'){
     activeCustomerPrompt()
     .then( (activeCustomer) => {
-      console.log('this customer is now active:', activeCustomer)
+      console.log('This customer is now active:', activeCustomer)
       //run active customer function that opens the customerMenuHandler
     });
   } else if (userInput.choice == '3') {
@@ -297,41 +300,59 @@ let completeOrderPrompt = () => {
   });
 };
 
-let productMenuHandler = (err, userInput) => {
-  console.log("user input", userInput);
-  // This could get messy quickly. Maybe a better way to parse the input?
+//responds to product menu selections for updating a product
+let productMenuHandler = (userInput, prodObj) => { //called in customerMenuHandler #5
   if(userInput.choice == '1') {
-      productNamePrompt()
-    .then( (productName) => {
-      console.log('this product name has been updated:', productName);
-      //run post payment to order function
+    let prodName = "product_name";
+    productNamePrompt() //prompts user to enter a new product name
+    .then( (newProdName) => {
+      //productUpdate takes args of column to change in the table, value to insert, product id, seller id and changes that one property on the db
+      productUpdate(prodName, newProdName.productName, prodObj.product_id, prodObj.seller_id)
+      .then( ()=>{
+        console.log('This product name has been updated:', newProdName.productName);
+        printAllCustomers();//return to main menu
+      })
     });
   } else if (userInput.choice == '2'){
+    let prodDesc = "description";
     productDescPrompt()
-    .then( (productDesc) => {
-      console.log('this description has been updated:', productDesc)
-      //run active customer function that opens the customerMenuHandler
+    .then( (newProdDescription) => {
+      productUpdate(prodDesc, newProdDescription.productDesc, prodObj.product_id, prodObj.seller_id)
+      .then( ()=>{
+        console.log('This product description has been updated:', newProdDescription.productDesc);
+        printAllCustomers();
+      })
     });
   } else if (userInput.choice == '3'){
+    let prodPrice = "price";
     productPricePrompt()
-    .then( (productPrice) => {
-      console.log('this product price has been updated:', productPrice)
+    .then( (newProductPrice) => {
+      productUpdate(prodPrice, newProductPrice.productPrice, prodObj.product_id, prodObj.seller_id)
+      console.log('This product price has been updated:', newProductPrice.productPrice)
+      printAllCustomers();
       //run active customer function that opens the customerMenuHandler
     });
   } else if (userInput.choice == '4'){
+    let prodType = "product_type_id";
     productTypePrompt()
-    .then( (productType) => {
-      console.log('this product type has been updated:', productType)
+    .then( (newProductType) => {
+      productUpdate(prodType, newProductType.productType, prodObj.product_id, prodObj.seller_id)
+      console.log('This product type has been updated:', newProductType.productType)
+      printAllCustomers();
       //run active customer function that opens the customerMenuHandler
     });
   } else if (userInput.choice == '5'){
+    let prodQty = "quantity_avail";
     productQtyPrompt()
-    .then( (productQty) => {
-      console.log('this product quantity has been updated:', productQty)
+    .then( (newProductQty) => {
+      productUpdate(prodQty, newProductQty.productQty, prodObj.product_id, prodObj.seller_id)
+      console.log('This product quantity has been updated:', newProductQty.productQty)
+      printAllCustomers();
       //run active customer function that opens the customerMenuHandler
     });
   } else if (userInput.choice == '6') {
-    prompt.stop();
+    printAllCustomers();
+    // prompt.stop();//need to return to previous menu here instead of kicking us out
   }
 };
 
@@ -344,6 +365,7 @@ let productNamePrompt = () => {
       required: true
     }], function(err, results) {
       if (err) return reject(err);
+      console.log("results product name prompt", results);
       resolve(results);
     })
   });
@@ -404,3 +426,15 @@ let productQtyPrompt = () => {
     })
   });
 };
+
+let updateProductPrompt = () => {
+  return new Promise( (resolve, reject) => {
+    prompt.get([{
+      name: 'choice',
+      description: 'Please make a selection'
+    }], function(err, results){
+      if (err) return reject (err)
+        resolve(results);
+    })
+  })
+}
