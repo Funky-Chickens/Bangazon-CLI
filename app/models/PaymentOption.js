@@ -49,5 +49,11 @@ let checkForOpenOrder = (id) => {
     });
 }
 
+let getOrderTotal = (id) => {
+    return new Promise( (resolve, reject) => {
+        db.all(`SELECT `)
+    })
+}
+
 
 module.exports = { postPaymentOption, getUsersPaymentOptions, addPaymentToOrder, checkForOpenOrder };
