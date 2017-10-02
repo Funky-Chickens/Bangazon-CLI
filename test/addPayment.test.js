@@ -4,8 +4,8 @@ let TIMEOUT = process.env.TIMEOUT;
 const chai = require("chai");
 const chaiAsPromised = require("chai-as-promised");
 chai.use(chaiAsPromised);
-const { assert: {property, eventually, isBoolean, equal, isNumber, exists, isFunction, isUndefined, isObject, isEqual, deepEqual} } = require('chai');
-const { postPaymentOption, getUsersPaymentOptions, addPaymentToOrder, checkForOpenOrder} = require('../app/models/PaymentOption.js');
+const { assert: {property, eventually, isBoolean, equal, isNumber, exists, isFunction, isUndefined, isObject, isEqual, deepEqual,isArray} } = require('chai');
+const { postPaymentOption, getUsersPaymentOptions, addPaymentToOrder, checkForOpenOrderToAddPayment} = require('../app/models/PaymentOption.js');
 const { getOneOrder } = require('../app/models/Order.js');
 const { buildPaymentsDB } = require('../db/build-db.js');
 
@@ -30,21 +30,20 @@ describe('PaymentOptions', () => {
         });
     });
     describe('CHECK function', () => {
-        it('Should be a function', () => isFunction(checkForOpenOrder, 'Function?'));
+        it('Should be a function', () => isFunction(checkForOpenOrderToAddPayment, 'Function?'));
         it('Should be able to retrieve an order with no payment type', () => {
-            return checkForOpenOrder(2)
+            return checkForOpenOrderToAddPayment(2)
             .then( (result) => {
-                isObject(result);
-                console.log("RESULT?", result);
+                isArray(result);
             });
         });
     });
     describe('GET function', () => {
         it('should be a function', () => isFunction(getUsersPaymentOptions, "getUsersPaymentOptions is a function"));
-        it('should get the object containing users payment options', () => {
+        it('should get an array containing users payment options', () => {
         return getUsersPaymentOptions(2)
         .then( (results) => { 
-            isObject(results);
+            isArray(results);
             }); 
         });
     });
