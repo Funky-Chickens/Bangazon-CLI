@@ -345,7 +345,8 @@ let productMenuHandler = (userInput, prodObj) => {
       //run active customer function that opens the customerMenuHandler
     });
   } else if (userInput.choice == '6') {
-    prompt.stop();//need to return to previous menu here instead of kicking us out
+    printAllCustomers();
+    // prompt.stop();//need to return to previous menu here instead of kicking us out
   }
 };
 
