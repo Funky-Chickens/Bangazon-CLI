@@ -92,15 +92,13 @@ let printAllCustomers = () => {
 }
 
 let customerMenuHandler = (err, userInput) => {
-  console.log(`You are currently working with customer id ${getActiveCustomer().id}`);
-  
   // This could get messy quickly. Maybe a better way to parse the input?
   if(userInput.choice == '1') {
     createPaymentPrompt()
     .then( (paymentData) => {
       console.log('payment data to save:', paymentData);
       //run post payment function and return to menu
-    });   
+    });
   } else if (userInput.choice == '2') {
     addToCartStart()
     .then( (prodObjs) => {
@@ -162,14 +160,14 @@ let customerMenuHandler = (err, userInput) => {
     deletableProducts(Number(getActiveCustomer().id))
     .then( (results) => {
       results.forEach( (item) => {
-        console.log("deletable products: ");
+        console.log("Deletable products: ");
         console.log(item.product_id, item.product_name);
       })
       deleteProdPrompt()
       .then( (productObj) => {
         deleteProduct(productObj.productId)
         .then( (result) => {
-         console.log('this product has been deleted'); 
+         console.log('This product has been deleted.');
          printAllCustomers();
         })
         .catch((err) => {
@@ -181,7 +179,6 @@ let customerMenuHandler = (err, userInput) => {
     .catch((err) => {
       console.log("deletable products error", err);
     })
-    
   } else if (userInput.choice == '7') {
     productPopPrompt()
     .then( (productPop) => {
@@ -191,6 +188,7 @@ let customerMenuHandler = (err, userInput) => {
   } else if (userInput.choice == '8') {
     module.exports.displayWelcome();
   } else if (userInput.choice == '9') {
+    console.log('Thank you for visiting Bangazon.  Goodbye.')
     prompt.stop();
   }
 };
@@ -214,7 +212,7 @@ let activeCustomerPrompt = () => {
       })
     })
   };
-  
+
   let createPaymentPrompt = () => {
     return new Promise( (resolve, reject) => {
       prompt.get([{
@@ -270,18 +268,17 @@ module.exports.displayOrder = (total) => {
 };
 
 let orderMenuHandler = (err, userInput) => {
-  console.log("user input", userInput);
   // This could get messy quickly. Maybe a better way to parse the input?
   if(userInput.choice == 'Y') {
       completeOrderPrompt()
     .then( (completeOrder) => {
-      console.log('this order is completed:', completeOrder);
+      console.log('This order is completed:', completeOrder);
       //run post payment to order function
     });
   } else if (userInput.choice == 'N'){
     activeCustomerPrompt()
     .then( (activeCustomer) => {
-      console.log('this customer is now active:', activeCustomer)
+      console.log('This customer is now active:', activeCustomer)
       //run active customer function that opens the customerMenuHandler
     });
   } else if (userInput.choice == '3') {
@@ -304,12 +301,10 @@ let completeOrderPrompt = () => {
 };
 
 let productMenuHandler = (userInput, prodObj) => {
-  console.log("user input", userInput);
   if(userInput.choice == '1') {
     let prodName = "product_name";
     productNamePrompt()
     .then( (newProdName) => {
-      console.log("product id?", prodObj.product_id)
       productUpdate(prodName, newProdName.productName, prodObj.product_id, prodObj.seller_id)
       .then( ()=>{
         console.log('This product name has been updated:', newProdName.productName);

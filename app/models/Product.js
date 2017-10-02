@@ -81,7 +81,6 @@ let getSellerProduct  = (id, prodId) => {
 
 let updateProduct = (tableString, value, product_Id, sellerId) => {
     return new Promise( (resolve, reject) => {
-        console.log("updateProduct in model", tableString, value, product_Id, sellerId)
         db.run(`UPDATE products set ${tableString} = "${value}" WHERE seller_id = ${sellerId}  AND product_id = ${product_Id}`, (err) => {
             if (err) return reject(err);
             resolve();
