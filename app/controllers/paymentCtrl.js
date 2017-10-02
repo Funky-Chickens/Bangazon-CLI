@@ -4,7 +4,7 @@ const prompt = require('prompt');
 const { getActiveCustomer } = require('../activeCustomer');
 const { postPaymentOption, getUsersPaymentOptions, addPaymentToOrder, checkForOpenOrderToAddPayment } = require('../models/PaymentOption');
 
-
+let PaymentAddToOrder = addPaymentToOrder;
 
 let createPaymentPrompt = () => {
     return new Promise( (resolve, reject) => {
@@ -36,26 +36,42 @@ let createPaymentPrompt = () => {
   }
 
 
-  let completeOrderPrompt = (userid) => {
-    getUsersPaymentOptions(userid)
-    .then( (pymOpts) => {
-      for (let i=1; i<pymOpts.length+1; i++) {
-      console.log("Payment option", i, pymOpts[i-1].payment_option_name, "ID:", pymOpts[i-1].payment_id);
-      }
+let getPaymentIds = (paymentOptions) => {
+    let paymentIdsArray = paymentOptions.map( (PO) => {
+      return PO.payment_id;
     })
+  return paymentIdsArray;
+}
+
+let paymentSelectMatch = (paymentIds, selection) => {
+  let payment = paymentIds[selection -1];
+  if (payment) return payment
+}
+
+let selectPayment = (selection, paymentObjs, userId) => {
+  return new Promise( (resolve, reject) => {
+    let paymentIdsArr = getPaymentIds(paymentObjs);
+    let payment = paymentSelectMatch(paymentIdsArr, selection);
+    resolve(payment);
+  })
+}
+
+
+  let completeOrderPrompt = () => {
     return new Promise( (resolve, reject) => {
       prompt.get([{
         name: 'paymentId',
-        description: "Enter the payment Id",
+        description: "Enter the payment selection",
         type: 'number',
         required: true
       }], function(err, results) {
         if (err) return reject(err);
-        addPaymentToOrder(results.paymentId, userid)
-        resolve(results);
+        resolve(results.paymentId);
       })
     });
   };
+
+  let getPaymentTypes = getUsersPaymentOptions;
 
   let completeOrderWithPayment = (userid) => { //this is called by ui.js line 265-ish
     return new Promise( (resolve, reject) => {
@@ -83,4 +99,4 @@ let createPaymentPrompt = () => {
   return total;
   }
 
-module.exports= { getPayment,completeOrderWithPayment, completeOrderPrompt, calcOrderTotal };
+module.exports= { getPayment,completeOrderWithPayment, completeOrderPrompt, calcOrderTotal, getPaymentTypes, selectPayment, PaymentAddToOrder };

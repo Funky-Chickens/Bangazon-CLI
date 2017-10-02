@@ -15,7 +15,7 @@ const { getActiveCustomer, setActiveCustomer } = require('./activeCustomer');
 const { addToCartStart, addToCart } = require('./controllers/orderCtrl');
 const { newProductPrompt, deleteProdPrompt } = require('./controllers/productCtrl')
 const { postNewProduct, deletableProducts, deleteProduct } = require('./models/Product')
-const { getPayment,completeOrderWithPayment, completeOrderPrompt, calcOrderTotal } = require('./controllers/paymentCtrl')
+const { getPayment, selectPayment, getPaymentTypes, completeOrderWithPayment, completeOrderPrompt, calcOrderTotal, PaymentAddToOrder } = require('./controllers/paymentCtrl')
 
 const db = new Database(path.join(__dirname, '..', 'db', 'bangazon.sqlite'));
 
@@ -279,16 +279,46 @@ module.exports.displayOrder = () => {
   });
 };
 
+let displayPayments = (paymentOpts) => {
+  return new Promise ( (resolve, reject) => {
+    let headerDivider = `${magenta('*********************************************************')}`
+    console.log(`
+    ${headerDivider}
+    ${magenta(`**  Your Payment Options  **`)}
+    ${headerDivider}`);
+    paymentOpts.forEach( (paymentOpts, i) => {
+        console.log(`${magenta(`${i + 1}. `)}${paymentOpts.payment_option_name}`)
+    });
+    resolve();
+  })
+}
+
+
+
 let orderMenuHandler = (err, userInput) => {
+  let paymentOptions = null;
+  let uid = Number(getActiveCustomer().id)
   console.log("user input", userInput);
   // This could get messy quickly. Maybe a better way to parse the input?
   if(userInput.choice == 'Y') {
     //Before we can launch complete order prompt, we need to display all the user's payment options
-      completeOrderPrompt(Number(getActiveCustomer().id)) //imported from paymentCtrl.js
-    .then( (completeOrder) => {
-      console.log('this order is completed:', completeOrder);
+    getPaymentTypes(uid) 
+    .then( (paymentTypes) => {
+      paymentOptions = paymentTypes
+      return displayPayments(paymentTypes)
+    })
+    .then(() => {
+      return completeOrderPrompt()
+    })
+    .then( (selection) => {
+      return selectPayment(selection, paymentOptions, uid)
+    })
+    .then( (paymentIDtoAdd) => {
+      return PaymentAddToOrder(paymentIDtoAdd, uid)
+    })
+    .then( (result) => {
       printAllCustomers()
-    });
+    }); 
   } else if (userInput.choice == 'N'){
     activeCustomerPrompt()
     .then( (activeCustomer) => {
