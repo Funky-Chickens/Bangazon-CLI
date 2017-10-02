@@ -137,7 +137,8 @@ let customerMenuHandler = (err, userInput) => {
 
   } else if (userInput.choice == '5') {
     showAllProducts(getActiveCustomer().id)//from productCtrl
-    .then( (prodObjs) => {
+    .then( (prodObjs) => {//if user has products, display them, if not, display error and take back to handler
+     if(prodObjs){
       displayProducts(prodObjs)
       updateProductPrompt()
       .then( (results) => {
@@ -151,6 +152,9 @@ let customerMenuHandler = (err, userInput) => {
           })
         })
       })
+    } else{
+        printAllCustomers()
+    }
     })
       //  console.log('these changes have been made to the product:', updatedProd);
       //run function to update product information
@@ -309,6 +313,7 @@ let productMenuHandler = (userInput, prodObj) => {
       productUpdate(prodName, newProdName.productName, prodObj.product_id, prodObj.seller_id)
       .then( ()=>{
         console.log('This product name has been updated:', newProdName.productName);
+        printAllCustomers();
       })
     });
   } else if (userInput.choice == '2'){
@@ -318,6 +323,7 @@ let productMenuHandler = (userInput, prodObj) => {
       productUpdate(prodDesc, newProdDescription.productDesc, prodObj.product_id, prodObj.seller_id)
       .then( ()=>{
         console.log('This product description has been updated:', newProdDescription.productDesc);
+        printAllCustomers();
       })
     });
   } else if (userInput.choice == '3'){
@@ -326,6 +332,7 @@ let productMenuHandler = (userInput, prodObj) => {
     .then( (newProductPrice) => {
       productUpdate(prodPrice, newProductPrice.productPrice, prodObj.product_id, prodObj.seller_id)
       console.log('This product price has been updated:', newProductPrice.productPrice)
+      printAllCustomers();
       //run active customer function that opens the customerMenuHandler
     });
   } else if (userInput.choice == '4'){
@@ -334,6 +341,7 @@ let productMenuHandler = (userInput, prodObj) => {
     .then( (newProductType) => {
       productUpdate(prodType, newProductType.productType, prodObj.product_id, prodObj.seller_id)
       console.log('This product type has been updated:', newProductType.productType)
+      printAllCustomers();
       //run active customer function that opens the customerMenuHandler
     });
   } else if (userInput.choice == '5'){
@@ -341,7 +349,8 @@ let productMenuHandler = (userInput, prodObj) => {
     productQtyPrompt()
     .then( (newProductQty) => {
       productUpdate(prodQty, newProductQty.productQty, prodObj.product_id, prodObj.seller_id)
-      console.log('this product quantity has been updated:', newProductQty.productQty)
+      console.log('This product quantity has been updated:', newProductQty.productQty)
+      printAllCustomers();
       //run active customer function that opens the customerMenuHandler
     });
   } else if (userInput.choice == '6') {

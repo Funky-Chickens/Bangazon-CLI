@@ -16,7 +16,7 @@ let getAllUserProducts = (id) => {
                 resolve(prods);
             } else {
                 console.log("no products available");
-                //need resolve here?
+                resolve();
             }
         });
     });
