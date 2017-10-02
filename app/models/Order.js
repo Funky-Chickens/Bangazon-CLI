@@ -45,4 +45,14 @@ let postOrder = (order_date, buyer_id) => {
     });
 }
 
-module.exports = { checkForOpenOrders, postOrder, getOneOrder };
+let getOrders = (productId) => {
+    return new Promise( (resolve, reject) => {
+        db.get(`SELECT * FROM productOrders WHERE prod_id = ${productId}`, function(err, prodOrdArr) {
+            if(err) return reject(err);
+            console.log("prodarr", prodOrdArr);
+            resolve(prodOrdArr);
+        })
+    })
+}
+
+module.exports = { checkForOpenOrders, postOrder, getOneOrder, getOrders };

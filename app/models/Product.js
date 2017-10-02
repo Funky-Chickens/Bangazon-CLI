@@ -53,7 +53,13 @@ let deletableProducts = (id) => {
             LEFT JOIN orders ON productOrders.order_id = orders.order_id
             WHERE orders.order_id IS NULL AND products.product_id IS NOT NULL AND users.user_id = ${id}`, function(err, deleteArr) {
                 if(err) return reject(err);
-                resolve(deleteArr);
+                //  if (deleteArr[0] && deleteArr[0].seller_id) {
+                //     console.log("array", deleteArr);
+                //     // resolve(deleteArr);
+                // } else {
+                //     console.log("no products available to be deleted");
+                // }
+                resolve(deleteArr)
         });     
     });
 };

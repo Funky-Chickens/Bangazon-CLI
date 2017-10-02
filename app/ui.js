@@ -13,7 +13,7 @@ const { promptNewCustomer } = require('./controllers/customerCtrl');
 const { postUserObj, getAllUsers } = require('./models/Customer');
 const { getActiveCustomer, setActiveCustomer } = require('./activeCustomer');
 const { addToCartStart, addToCart } = require('./controllers/orderCtrl');
-const { newProductPrompt, deleteProdPrompt } = require('./controllers/productCtrl')
+const { newProductPrompt, deleteProdPrompt, displayDeletableProducts, deleteFromSeller } = require('./controllers/productCtrl')
 const { postNewProduct, deletableProducts, deleteProduct } = require('./models/Product')
 
 const db = new Database(path.join(__dirname, '..', 'db', 'bangazon.sqlite'));
@@ -154,27 +154,38 @@ let customerMenuHandler = (err, userInput) => {
     })
   } else if (userInput.choice == '6') {
     deletableProducts(Number(getActiveCustomer().id))
-    .then( (results) => {
-      results.forEach( (item) => {
-        console.log("deletable products: ");
-        console.log(item.product_id, item.product_name);
-      })
-      deleteProdPrompt()
-      .then( (productObj) => {
-        deleteProduct(productObj.productId)
-        .then( (result) => {
-         console.log('this product has been deleted'); 
-         printAllCustomers();
-        })
-        .catch((err) => {
-         console.log("delete product error", err)
-        })
-      //run function to get popularity of entered product
+    .then( (prodObj) => {
+      if(prodObj.length === 0) {
+        console.log("no products available to delete");
+        printAllCustomers();
+      } else {
+          displayDeletableProducts(prodObj);
+          deleteProdPrompt()
+          .then( (data) => {
+            deleteFromSeller(data.productId, prodObj, getActiveCustomer().id)
+               .then( () => {
+                  printAllCustomers();
+              })
+          })
+      }
+
+    //   deleteProdPrompt()
+    //   .then( (productObj) => {
+    //     deleteProduct(productObj.productId)
+    //     .then( (result) => {
+    //      console.log('this product has been deleted'); 
+    //      printAllCustomers();
+    //     })
+    //     .catch((err) => {
+    //      console.log("delete product error", err)
+    //     })
+    //   //run function to get popularity of entered product
+    // })
     })
-    })
-    .catch((err) => {
-      console.log("deletable products error", err);
-    })
+  // }
+    // .catch((err) => {
+    //   console.log("deletable products error", err);
+    // })
     
   } else if (userInput.choice == '7') {
     productPopPrompt()
