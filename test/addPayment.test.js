@@ -32,7 +32,8 @@ describe('PaymentOptions', () => {
     describe('CHECK function', () => {
         it('Should be a function', () => isFunction(checkForOpenOrder, 'Function?'));
         it('Should be able to retrieve an order with no payment type', () => {
-            return checkForOpenOrder(2).then( (result) => {
+            return checkForOpenOrder(2)
+            .then( (result) => {
                 isObject(result);
                 console.log("RESULT?", result);
             });
@@ -41,7 +42,8 @@ describe('PaymentOptions', () => {
     describe('GET function', () => {
         it('should be a function', () => isFunction(getUsersPaymentOptions, "getUsersPaymentOptions is a function"));
         it('should get the object containing users payment options', () => {
-        return getUsersPaymentOptions(2).then( (results) => { 
+        return getUsersPaymentOptions(2)
+        .then( (results) => { 
             isObject(results);
             }); 
         });
@@ -49,7 +51,9 @@ describe('PaymentOptions', () => {
     describe('POST function', () => {
         it('should be a function', () => isFunction(addPaymentToOrder, "addPaymentToOrder is a function"));
         it('should post the selected payment option to the customers open order', () => {
-        return addPaymentToOrder(2,2).then( () => { 
+        return addPaymentToOrder(2,2)
+        .then( (getback) => { 
+            isNumber(getback);
             }); 
         });
     });

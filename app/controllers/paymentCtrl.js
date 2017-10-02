@@ -39,9 +39,8 @@ let createPaymentPrompt = () => {
   let completeOrderPrompt = (userid) => {
     getUsersPaymentOptions(userid)
     .then( (pymOpts) => {
-      for (let i=1; i<pymOpts.length; i++) {
-      console.log("Payment option", i, pymOpts.payment_option_name, "ID:", pymOpts.payment_id);
-        
+      for (let i=1; i<pymOpts.length+1; i++) {
+      console.log("Payment option", i, pymOpts[i-1].payment_option_name, "ID:", pymOpts[i-1].payment_id);
       }
     })
     return new Promise( (resolve, reject) => {
@@ -52,6 +51,7 @@ let createPaymentPrompt = () => {
         required: true
       }], function(err, results) {
         if (err) return reject(err);
+        addPaymentToOrder(results.paymentId, userid)
         resolve(results);
       })
     });
@@ -61,14 +61,19 @@ let createPaymentPrompt = () => {
     return new Promise( (resolve, reject) => {
       checkForOpenOrderToAddPayment(userid) //from the PaymentOption.js model, which gets an array of objects with prices of all items in the open order
       .then( (results) => {
-      let prices = []; //result is an array of objects with prices inside them
-      results.forEach( (object) => {
-        prices.push(object.price);
-      })
-      resolve(prices);
-      })
-     })
-   }
+        if (results) {
+          let prices = []; //result is an array of objects with prices inside them
+          results.forEach( (object) => {
+            prices.push(object.price);
+          })
+          resolve(prices);
+          } else {
+            console.log("Sorry, you don't have any open orders.");
+            resolve();
+          }
+        })
+    })
+  }
 
 //to add up all the prices in the array - el
   let calcOrderTotal = (pricesArr) => {

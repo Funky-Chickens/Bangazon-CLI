@@ -265,12 +265,17 @@ module.exports.displayOrder = () => {
   let uid = Number(getActiveCustomer().id);
   completeOrderWithPayment(uid)
   .then ( (results) => {
+    if (results){
+
     let total = calcOrderTotal(results);
   console.log(`Your order total is $${total}.   Ready to purchase? (Y/N), 3 to exit  **`);
     prompt.get([{
       name: 'choice',
       description: 'Please make a selection'
     }], orderMenuHandler );
+  } else {
+    printAllCustomers();
+  }
   });
 };
 
@@ -282,7 +287,7 @@ let orderMenuHandler = (err, userInput) => {
       completeOrderPrompt(Number(getActiveCustomer().id)) //imported from paymentCtrl.js
     .then( (completeOrder) => {
       console.log('this order is completed:', completeOrder);
-      //run post payment to order function
+      printAllCustomers()
     });
   } else if (userInput.choice == 'N'){
     activeCustomerPrompt()
