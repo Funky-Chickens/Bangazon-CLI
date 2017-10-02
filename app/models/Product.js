@@ -48,14 +48,14 @@ let getAllProducts = () => {
 
 let deletableProducts = (id) => {
     return new Promise( (resolve, reject) => {
-        db.all(`SELECT products.product_id, products.product_name FROM users 
+        db.all(`SELECT products.product_id, products.product_name FROM users
             LEFT JOIN products ON users.user_id = products.seller_id
             LEFT JOIN productOrders ON products.product_id = productOrders.prod_id
             LEFT JOIN orders ON productOrders.order_id = orders.order_id
             WHERE orders.order_id IS NULL AND products.product_id IS NOT NULL AND users.user_id = ${id}`, function(err, deleteArr) {
                 if(err) return reject(err);
                 resolve(deleteArr);
-        });     
+        });
     });
 };
 
@@ -79,7 +79,7 @@ let getSellerProduct  = (id, prodId) => {
         });
 };
 
-let updateProduct = (tableString, value, product_Id, sellerId) => {
+let updateProduct = (tableString, value, product_Id, sellerId) => {//grabbed by productCtrl with productUpdate
     return new Promise( (resolve, reject) => {
         db.run(`UPDATE products set ${tableString} = "${value}" WHERE seller_id = ${sellerId}  AND product_id = ${product_Id}`, (err) => {
             if (err) return reject(err);

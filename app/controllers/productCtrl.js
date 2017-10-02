@@ -106,5 +106,5 @@ module.exports.productUpdateMenu = (prodObj) => {
 })
 }
 
-module.exports.productUpdate= updateProduct; //use as intermediary
+module.exports.productUpdate= updateProduct; //use as intermediary between model and controller
 
