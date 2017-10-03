@@ -61,10 +61,15 @@ let mainMenuHandler = (err, userInput) => {
     activeCustomerPrompt()
     .then( (activeCustomer) => {
       //get active customer and set active customer
-      setActiveCustomer(activeCustomer.customerId);
-      console.log(`Customer ${activeCustomer.customerId} is now active.`);
-      //run active customer function that opens the customerMenuHandler
-      printAllCustomers();
+      if (activeCustomer.customerId > numOfUsers) {
+        console.log("Please enter a valid selection.");
+        module.exports.displayWelcome();
+      } else {
+        setActiveCustomer(activeCustomer.customerId);
+        console.log(`Customer ${activeCustomer.customerId} is now active.`);
+        //run active customer function that opens the customerMenuHandler
+        printAllCustomers();
+      }
     });
   } else if (userInput.choice == '3') {
     console.log("Thank you for visiting Bangazon.  Goodbye.")
@@ -202,10 +207,13 @@ let customerMenuHandler = (err, userInput) => {//handles main menu input
   }
 };
 
+let numOfUsers = null;
+
 let activeCustomerPrompt = () => {
   return new Promise( (resolve, reject) => {
     getAllUsers()//GET list of all customer names and ids using customer js model
-    .then((allUsers)=>{
+    .then( (allUsers) => {
+      numOfUsers = allUsers.length;
       allUsers.forEach((user) => {
         console.log(`${user.user_id}: ${user.Name}`)
       });
