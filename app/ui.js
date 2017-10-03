@@ -13,9 +13,9 @@ const { promptNewCustomer } = require('./controllers/customerCtrl');
 const { postUserObj, getAllUsers } = require('./models/Customer');
 const { getActiveCustomer, setActiveCustomer } = require('./activeCustomer');
 const { addToCartStart, addToCart } = require('./controllers/orderCtrl');
+const { getPayment, selectPayment, getPaymentTypes, completeOrderWithPayment, completeOrderPrompt, calcOrderTotal, PaymentAddToOrder } = require('./controllers/paymentCtrl')
 const { newProductPrompt, deleteProdPrompt, showAllProducts, productUpdateMenu, selectProduct, productUpdate } = require('./controllers/productCtrl')
 const { getAllUserProducts, getAllProducts, postNewProduct, deletableProducts, deleteProduct, getSellerProduct } = require('./models/Product')
-
 const db = new Database(path.join(__dirname, '..', 'db', 'bangazon.sqlite'));
 
 let date = new Date;
@@ -92,11 +92,15 @@ let printAllCustomers = () => {//main menu
 
 let customerMenuHandler = (err, userInput) => {//handles main menu input
   if(userInput.choice == '1') {
-    createPaymentPrompt() //brings up prompt to add a payment option
+    getPayment(Number(getActiveCustomer().id))
     .then( (paymentData) => {
-      console.log('payment data to save:', paymentData);
+      console.log('payment type Added!');
+      printAllCustomers();
       //run post payment function and return to menu
-    });
+    }).catch( (err) => {
+      console.log("errormagherd", err);
+    }); 
+
   } else if (userInput.choice == '2') {
     addToCartStart()//add product to shopping cart
     .then( (prodObjs) => {
@@ -233,7 +237,7 @@ let activeCustomerPrompt = () => {
   });
 };
 
-//DISPLAY PRODUCTS: takes any array of objects and displays them numerically (1, 2, 3...) -jmr
+//DISPLAY PRODUCTS: takes any array of objects and displays them numberically (1, 2, 3...) -jmr
 let displayProducts = (prodObjs) => {
   let headerDivider = `${magenta('*********************************************************')}`
   console.log(`
@@ -259,23 +263,67 @@ let addToCartPrompt = () => {
   });
 };
 
-module.exports.displayOrder = (total) => {
-  console.log('Your order total is', total, 'Ready to purchase (Y/N)  **');
+//edited to call functions in correct order to get the calculated order total - el/cm
+module.exports.displayOrder = () => {
+  let uid = Number(getActiveCustomer().id);
+  completeOrderWithPayment(uid)
+  .then ( (results) => {
+    if (results){
+
+    let total = calcOrderTotal(results);
+  console.log(`Your order total is $${total}.   Ready to purchase? (Y/N), 3 to exit  **`);
     prompt.get([{
       name: 'choice',
       description: 'Please make a selection'
     }], orderMenuHandler );
+  } else {
+    printAllCustomers();
+  }
+  });
 };
 
+let displayPayments = (paymentOpts) => {
+  return new Promise ( (resolve, reject) => {
+    let headerDivider = `${magenta('*********************************************************')}`
+    console.log(`
+    ${headerDivider}
+    ${magenta(`**  Your Payment Options  **`)}
+    ${headerDivider}`);
+    paymentOpts.forEach( (paymentOpts, i) => {
+        console.log(`${magenta(`${i + 1}. `)}${paymentOpts.payment_option_name}`)
+    });
+    resolve();
+  })
+}
+
+
+
 let orderMenuHandler = (err, userInput) => {
+  let paymentOptions = null;
+  let uid = Number(getActiveCustomer().id)
+  console.log("user input", userInput);
   // This could get messy quickly. Maybe a better way to parse the input?
   if(userInput.choice == 'Y') {
-      completeOrderPrompt()
-    .then( (completeOrder) => {
-      console.log('This order is completed:', completeOrder);
-      //run post payment to order function
-    });
-  } else if (userInput.choice == 'N'){
+    //Before we can launch complete order prompt, we need to display all the user's payment options
+    getPaymentTypes(uid) 
+    .then( (paymentTypes) => {
+      paymentOptions = paymentTypes
+      return displayPayments(paymentTypes)
+    })
+    .then(() => {
+      return completeOrderPrompt()
+    })
+    .then( (selection) => {
+      return selectPayment(selection, paymentOptions, uid)
+    })
+    .then( (paymentIDtoAdd) => {
+      return PaymentAddToOrder(paymentIDtoAdd, uid)
+    })
+    .then( (result) => {
+      console.log("This order has been completed.");
+      printAllCustomers()
+    }); 
+  } else if (userInput.choice == 'N') {
     activeCustomerPrompt()
     .then( (activeCustomer) => {
       console.log('This customer is now active:', activeCustomer)
@@ -286,22 +334,8 @@ let orderMenuHandler = (err, userInput) => {
   }
 };
 
-let completeOrderPrompt = () => {
-  return new Promise( (resolve, reject) => {
-    prompt.get([{
-      name: 'paymentId',
-      description: "Enter the payment Id",
-      type: 'number',
-      required: true
-    }], function(err, results) {
-      if (err) return reject(err);
-      resolve(results);
-    })
-  });
-};
-
-//responds to product menu selections for updating a product
-let productMenuHandler = (userInput, prodObj) => { //called in customerMenuHandler #5
+let productMenuHandler = (err, userInput) => {
+  console.log("user input", userInput);
   if(userInput.choice == '1') {
     let prodName = "product_name";
     productNamePrompt() //prompts user to enter a new product name
