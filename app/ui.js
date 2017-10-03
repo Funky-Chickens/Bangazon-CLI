@@ -289,10 +289,15 @@ let displayPayments = (paymentOpts) => {
     ${headerDivider}
     ${magenta(`**  Your Payment Options  **`)}
     ${headerDivider}`);
-    paymentOpts.forEach( (paymentOpts, i) => {
-        console.log(`${magenta(`${i + 1}. `)}${paymentOpts.payment_option_name}`)
-    });
-    resolve();
+    if (paymentOpts.length > 0) {
+      paymentOpts.forEach( (paymentOpts, i) => {
+          console.log(`${magenta(`${i + 2}. `)}${paymentOpts.payment_option_name}`)
+      });
+      resolve();
+    } else {
+      console.log("You must add a payment option to proceed. Choose option 1.");
+      printAllCustomers();
+    }
   })
 }
 
@@ -303,7 +308,7 @@ let orderMenuHandler = (err, userInput) => {
   let uid = Number(getActiveCustomer().id)
   console.log("user input", userInput);
   // This could get messy quickly. Maybe a better way to parse the input?
-  if(userInput.choice == 'Y') {
+  if(userInput.choice.toUpperCase() == 'Y') {
     //Before we can launch complete order prompt, we need to display all the user's payment options
     getPaymentTypes(uid) 
     .then( (paymentTypes) => {
@@ -323,12 +328,8 @@ let orderMenuHandler = (err, userInput) => {
       console.log("This order has been completed.");
       printAllCustomers()
     }); 
-  } else if (userInput.choice == 'N') {
-    activeCustomerPrompt()
-    .then( (activeCustomer) => {
-      console.log('This customer is now active:', activeCustomer)
-      //run active customer function that opens the customerMenuHandler
-    });
+  } else if (userInput.choice.toUpperCase() == 'N') {
+    printAllCustomers()
   } else if (userInput.choice == '3') {
     prompt.stop();
   }
