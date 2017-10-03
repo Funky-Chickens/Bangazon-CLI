@@ -8,14 +8,15 @@ const path = require('path');
 const { Database } = require('sqlite3').verbose();
 prompt.message = colors.blue("Bangazon Corp");
 
-// app modules
-const { promptNewCustomer } = require('./controllers/customerCtrl');
+//requiring in models - TODO: refactor these out, run everything through controllers
 const { postUserObj, getAllUsers } = require('./models/Customer');
+const { getAllUserProducts, getAllProducts, postNewProduct, deletableProducts, deleteProduct, getSellerProduct } = require('./models/Product')
+// app modules
 const { getActiveCustomer, setActiveCustomer } = require('./activeCustomer');
+const { promptNewCustomer } = require('./controllers/customerCtrl');
 const { addToCartStart, addToCart } = require('./controllers/orderCtrl');
-const { newProductPrompt, deleteProdPrompt, displayDeletableProducts, deleteFromSeller } = require('./controllers/productCtrl')
-const { postNewProduct, deletableProducts, deleteProduct } = require('./models/Product')
-
+const { getPayment, selectPayment, getPaymentTypes, completeOrderWithPayment, completeOrderPrompt, calcOrderTotal, PaymentAddToOrder } = require('./controllers/paymentCtrl')
+const { newProductPrompt, deleteProdPrompt, displayDeletableProducts, deleteFromSeller, showAllProducts, productUpdateMenu, selectProduct, productUpdate, productNamePrompt, productDescPrompt, productPricePrompt, productTypePrompt, productQtyPrompt, updateProductPrompt } = require('./controllers/productCtrl')
 const db = new Database(path.join(__dirname, '..', 'db', 'bangazon.sqlite'));
 
 let date = new Date;
@@ -23,7 +24,7 @@ let date = new Date;
 
 prompt.start();
 
-module.exports.displayWelcome = () => {
+module.exports.displayWelcome = () => {//first menu
   let headerDivider = `${magenta('*********************************************************')}`
   console.log(`
   ${headerDivider}
@@ -34,12 +35,13 @@ module.exports.displayWelcome = () => {
   ${magenta('3.')} Leave Bangazon!`);
     prompt.get([{
       name: 'choice',
-      description: 'Please make a selection'
+      description: 'Please make a selection',
+      type: 'integer',
+      required: true
     }], mainMenuHandler );
 };
 
 let mainMenuHandler = (err, userInput) => {
-  // This could get messy quickly. Maybe a better way to parse the input?
   if(userInput.choice == '1') {
     promptNewCustomer() //in customerCtrl.js
     .then( (custData) => {
@@ -48,21 +50,26 @@ let mainMenuHandler = (err, userInput) => {
       postUserObj(custData) //in Customer.js
       .then( (result) => {
         console.log("This new customer was saved with the ID: ", result);
-        module.exports.displayWelcome();
+        module.exports.displayWelcome();//back to first menu
       })
       .catch( (err) => {
         console.log("errormagherd", err);
-      }); 
+      });
       //-ladies
     });
   } else if (userInput.choice == '2'){
     activeCustomerPrompt()
     .then( (activeCustomer) => {
       //get active customer and set active customer
-      setActiveCustomer(activeCustomer.customerId);
-      console.log(`Customer ${activeCustomer.customerId} is now active.`);
-      //run active customer function that opens the customerMenuHandler
-      printAllCustomers();
+      if (activeCustomer.customerId > numOfUsers) {
+        console.log("Please enter a valid selection.");
+        module.exports.displayWelcome();
+      } else {
+        setActiveCustomer(activeCustomer.customerId);
+        console.log(`Customer ${activeCustomer.customerId} is now active.`);
+        //run active customer function that opens the customerMenuHandler
+        printAllCustomers();
+      }
     });
   } else if (userInput.choice == '3') {
     console.log("Thank you for visiting Bangazon.  Goodbye.")
@@ -70,7 +77,7 @@ let mainMenuHandler = (err, userInput) => {
   }
 };
 
-let printAllCustomers = () => {
+let printAllCustomers = () => {//main menu
   let headerDivider = `${magenta('*********************************************************')}`
   console.log(`
   ${headerDivider}
@@ -82,27 +89,29 @@ let printAllCustomers = () => {
   ${magenta('4.')} Add a product to sell
   ${magenta('5.')} Update product information
   ${magenta('6.')} Delete product
-  ${magenta('7.')} See product popularity
-  ${magenta('8.')} Return to the main menu
-  ${magenta('9.')} Leave Bangazon!`);
+  ${magenta('7.')} Return to the main menu
+  ${magenta('8.')} Leave Bangazon!`);
   prompt.get([{
     name: 'choice',
-    description: 'Please make a selection'
+    description: 'Please make a selection',
+    type: 'integer',
+    required: true
   }], customerMenuHandler );
 }
 
-let customerMenuHandler = (err, userInput) => {
-  console.log(`You are currently working with customer id ${getActiveCustomer().id}`);
-  
-  // This could get messy quickly. Maybe a better way to parse the input?
+let customerMenuHandler = (err, userInput) => {//handles main menu input
   if(userInput.choice == '1') {
-    createPaymentPrompt()
+    getPayment(Number(getActiveCustomer().id))
     .then( (paymentData) => {
-      console.log('payment data to save:', paymentData);
+      console.log('payment type Added!');
+      printAllCustomers();
       //run post payment function and return to menu
-    });   
+    }).catch( (err) => {
+      console.log("errormagherd", err);
+    });
+
   } else if (userInput.choice == '2') {
-    addToCartStart()
+    addToCartStart()//add product to shopping cart
     .then( (prodObjs) => {
       if(prodObjs.length === 0) {
         console.log("No Products Available")
@@ -118,9 +127,9 @@ let customerMenuHandler = (err, userInput) => {
       })
     }
     });
-    } else if (userInput.choice == '3') {
+    } else if (userInput.choice == '3') {//complete order
       module.exports.displayOrder();
-    } else if (userInput.choice == '4') {
+    } else if (userInput.choice == '4') {//add product to sell
     newProductPrompt()
     .then( (newProduct) => {
       newProduct.seller_id = Number(getActiveCustomer().id);
@@ -135,25 +144,34 @@ let customerMenuHandler = (err, userInput) => {
       });
     });
 
-  } else if (userInput.choice == '5') {
-    productPopPrompt()
-    .then( (updatedProd) => {
-      console.log(`
-      ${magenta('1.')} Product Name
-      ${magenta('2.')} Product Description
-      ${magenta('3.')} Product Price
-      ${magenta('4.')} Product Type Id
-      ${magenta('5.')} Quantity Available
-        ${magenta('6.')} Return to Customer Menu`)
-        prompt.get([{
-          name: 'choice',
-          description: 'Please make a selection'
-        }], productMenuHandler );
-      // console.log('these changes have been made to the product:', updatedProd);
+  } else if (userInput.choice == '5') {//update seller product information
+    showAllProducts(getActiveCustomer().id)//from productCtrl, show all of active user's products
+    .then( (prodObjs) => {//if user has products, display them, if not, display error and take back to handler
+     if(prodObjs) {
+      displayProducts(prodObjs);
+      updateProductPrompt()//prompt user to choose what product to modify from a numbered list (doesn't necessarily correspond to id of product object)
+      .then( (results) => {
+        selectProduct(results.choice, prodObjs, getActiveCustomer().id)//use user input, the product object, and the active customer id to
+        // select that product by matching its id rather than just using user input number(see controller)
+        .then( (productObj) => {
+          console.log(`You selected product ${productObj.product_id}, ${productObj.Name}`);
+          console.log('Please choose what you would like to change:')
+          productUpdateMenu(productObj)//see controller- this uses the product object to populate menu of choices of what property to change
+          //on that object
+          .then( (propertyToUpdate) =>{//propertyToUpdate = user input on what to change
+            productMenuHandler(propertyToUpdate, productObj)//brings up productMenuHandler in this file that takes over from here
+          });
+        });
+      });
+    } else {
+        printAllCustomers();
+    }
+  });
+      //  console.log('these changes have been made to the product:', updatedProd);
       //run function to update product information
-    })
-  } else if (userInput.choice == '6') {
+  } else if (userInput.choice == '6') {//delete a seller product
     deletableProducts(Number(getActiveCustomer().id))
+<<<<<<< HEAD
     .then( (prodObj) => {
       if(prodObj.length === 0) {
         console.log("no products available to delete");
@@ -188,29 +206,27 @@ let customerMenuHandler = (err, userInput) => {
     // })
     
   } else if (userInput.choice == '7') {
-    productPopPrompt()
-    .then( (productPop) => {
-      console.log('the popularity for', productPop, 'is:');
-      //run function to get popularity of entered product
-    })
-  } else if (userInput.choice == '8') {
     module.exports.displayWelcome();
-  } else if (userInput.choice == '9') {
+  } else if (userInput.choice == '8') {
+    console.log('Thank you for visiting Bangazon.  Goodbye.')
     prompt.stop();
   }
 };
 
+let numOfUsers = null;
+
 let activeCustomerPrompt = () => {
   return new Promise( (resolve, reject) => {
     getAllUsers()//GET list of all customer names and ids using customer js model
-    .then((allUsers)=>{
+    .then( (allUsers) => {
+      numOfUsers = allUsers.length;
       allUsers.forEach((user) => {
         console.log(`${user.user_id}: ${user.Name}`)
       });
         prompt.get([{
           name: 'customerId',
           description: "Enter the customer's Id",
-          type: 'string',
+          type: 'integer',
           required: true
         }], function(err, results) {
           if (err) return reject(err);
@@ -219,7 +235,7 @@ let activeCustomerPrompt = () => {
       })
     })
   };
-  
+
   let createPaymentPrompt = () => {
     return new Promise( (resolve, reject) => {
       prompt.get([{
@@ -266,152 +282,128 @@ let addToCartPrompt = () => {
   });
 };
 
-module.exports.displayOrder = (total) => {
-  console.log('Your order total is', total, 'Ready to purchase (Y/N)  **');
+//edited to call functions in correct order to get the calculated order total - el/cm
+module.exports.displayOrder = () => {
+  let uid = Number(getActiveCustomer().id);
+  completeOrderWithPayment(uid)
+  .then ( (results) => {
+    if (results){
+
+    let total = calcOrderTotal(results);
+  console.log(`Your order total is $${total}.   Ready to purchase? (Y/N), 3 to exit  **`);
     prompt.get([{
       name: 'choice',
       description: 'Please make a selection'
     }], orderMenuHandler );
+  } else {
+    printAllCustomers();
+  }
+  });
 };
 
+let displayPayments = (paymentOpts) => {
+  return new Promise ( (resolve, reject) => {
+    let headerDivider = `${magenta('*********************************************************')}`
+    console.log(`
+    ${headerDivider}
+    ${magenta(`**  Your Payment Options  **`)}
+    ${headerDivider}`);
+    if (paymentOpts.length > 0) {
+      paymentOpts.forEach( (paymentOpts, i) => {
+          console.log(`${magenta(`${i + 1}. `)}${paymentOpts.payment_option_name}`)
+      });
+      resolve();
+    } else {
+      console.log("You must add a payment option to proceed. Choose option 1.");
+      printAllCustomers();
+    }
+  })
+}
+
+
+
 let orderMenuHandler = (err, userInput) => {
-  console.log("user input", userInput);
-  // This could get messy quickly. Maybe a better way to parse the input?
-  if(userInput.choice == 'Y') {
-      completeOrderPrompt()
-    .then( (completeOrder) => {
-      console.log('this order is completed:', completeOrder);
-      //run post payment to order function
-    });
-  } else if (userInput.choice == 'N'){
-    activeCustomerPrompt()
-    .then( (activeCustomer) => {
-      console.log('this customer is now active:', activeCustomer)
-      //run active customer function that opens the customerMenuHandler
-    });
+  let paymentOptions = null;
+  let uid = Number(getActiveCustomer().id)
+  if(userInput.choice.toUpperCase() == 'Y') {
+    //Before we can launch complete order prompt, we need to display all the user's payment options
+    getPaymentTypes(uid) 
+    .then( (paymentTypes) => {
+      paymentOptions = paymentTypes
+      return displayPayments(paymentTypes)
+    })
+    .then(() => {
+      return completeOrderPrompt()
+    })
+    .then( (selection) => {
+      return selectPayment(selection, paymentOptions, uid)
+    })
+    .then( (paymentIDtoAdd) => {
+      return PaymentAddToOrder(paymentIDtoAdd, uid)
+    })
+    .then( (result) => {
+      console.log("This order has been completed.");
+      printAllCustomers()
+    }); 
+  } else if (userInput.choice.toUpperCase() == 'N') {
+    printAllCustomers()
   } else if (userInput.choice == '3') {
     prompt.stop();
   }
 };
 
-let completeOrderPrompt = () => {
-  return new Promise( (resolve, reject) => {
-    prompt.get([{
-      name: 'paymentId',
-      description: "Enter the payment Id",
-      type: 'number',
-      required: true
-    }], function(err, results) {
-      if (err) return reject(err);
-      resolve(results);
-    })
-  });
-};
-
-let productMenuHandler = (err, userInput) => {
-  console.log("user input", userInput);
-  // This could get messy quickly. Maybe a better way to parse the input?
+let productMenuHandler = (userInput, prodObj) => {
   if(userInput.choice == '1') {
-      productNamePrompt()
-    .then( (productName) => {
-      console.log('this product name has been updated:', productName);
-      //run post payment to order function
+    let prodName = "product_name";
+    productNamePrompt() //prompts user to enter a new product name
+    .then( (newProdName) => {
+      //productUpdate takes args of column to change in the table, value to insert, product id, seller id and changes that one property on the db
+      productUpdate(prodName, newProdName.productName, prodObj.product_id, prodObj.seller_id)
+      .then( ()=>{
+        console.log('This product name has been updated:', newProdName.productName);
+        printAllCustomers();//return to main menu
+      })
     });
   } else if (userInput.choice == '2'){
+    let prodDesc = "description";
     productDescPrompt()
-    .then( (productDesc) => {
-      console.log('this description has been updated:', productDesc)
-      //run active customer function that opens the customerMenuHandler
+    .then( (newProdDescription) => {
+      productUpdate(prodDesc, newProdDescription.productDesc, prodObj.product_id, prodObj.seller_id)
+      .then( ()=>{
+        console.log('This product description has been updated:', newProdDescription.productDesc);
+        printAllCustomers();
+      })
     });
   } else if (userInput.choice == '3'){
+    let prodPrice = "price";
     productPricePrompt()
-    .then( (productPrice) => {
-      console.log('this product price has been updated:', productPrice)
+    .then( (newProductPrice) => {
+      productUpdate(prodPrice, newProductPrice.productPrice, prodObj.product_id, prodObj.seller_id)
+      console.log('This product price has been updated:', newProductPrice.productPrice)
+      printAllCustomers();
       //run active customer function that opens the customerMenuHandler
     });
   } else if (userInput.choice == '4'){
+    let prodType = "product_type_id";
     productTypePrompt()
-    .then( (productType) => {
-      console.log('this product type has been updated:', productType)
+    .then( (newProductType) => {
+      productUpdate(prodType, newProductType.productType, prodObj.product_id, prodObj.seller_id)
+      console.log('This product type has been updated:', newProductType.productType)
+      printAllCustomers();
       //run active customer function that opens the customerMenuHandler
     });
   } else if (userInput.choice == '5'){
+    let prodQty = "quantity_avail";
     productQtyPrompt()
-    .then( (productQty) => {
-      console.log('this product quantity has been updated:', productQty)
+    .then( (newProductQty) => {
+      productUpdate(prodQty, newProductQty.productQty, prodObj.product_id, prodObj.seller_id)
+      console.log('This product quantity has been updated:', newProductQty.productQty)
+      printAllCustomers();
       //run active customer function that opens the customerMenuHandler
     });
   } else if (userInput.choice == '6') {
-    prompt.stop();
+    printAllCustomers();
+    // prompt.stop();//need to return to previous menu here instead of kicking us out
   }
 };
 
-let productNamePrompt = () => {
-  return new Promise( (resolve, reject) => {
-    prompt.get([{
-      name: 'productName',
-      description: "Enter the new product name",
-      type: 'string',
-      required: true
-    }], function(err, results) {
-      if (err) return reject(err);
-      resolve(results);
-    })
-  });
-};
-
-let productDescPrompt = () => {
-  return new Promise( (resolve, reject) => {
-    prompt.get([{
-      name: 'productDesc',
-      description: "Enter the new product description",
-      type: 'string',
-      required: true
-    }], function(err, results) {
-      if (err) return reject(err);
-      resolve(results);
-    })
-  });
-};
-
-let productPricePrompt = () => {
-  return new Promise( (resolve, reject) => {
-    prompt.get([{
-      name: 'productPrice',
-      description: "Enter the new product price",
-      type: 'string',
-      required: true
-    }], function(err, results) {
-      if (err) return reject(err);
-      resolve(results);
-    })
-  });
-};
-
-let productTypePrompt = () => {
-  return new Promise( (resolve, reject) => {
-    prompt.get([{
-      name: 'productType',
-      description: "Enter the new product type id",
-      type: 'number',
-      required: true
-    }], function(err, results) {
-      if (err) return reject(err);
-      resolve(results);
-    })
-  });
-};
-
-let productQtyPrompt = () => {
-  return new Promise( (resolve, reject) => {
-    prompt.get([{
-      name: 'productQty',
-      description: "Enter the new product quantity",
-      type: 'number',
-      required: true
-    }], function(err, results) {
-      if (err) return reject(err);
-      resolve(results);
-    })
-  });
-};
