@@ -291,7 +291,7 @@ let displayPayments = (paymentOpts) => {
     ${headerDivider}`);
     if (paymentOpts.length > 0) {
       paymentOpts.forEach( (paymentOpts, i) => {
-          console.log(`${magenta(`${i + 2}. `)}${paymentOpts.payment_option_name}`)
+          console.log(`${magenta(`${i + 1}. `)}${paymentOpts.payment_option_name}`)
       });
       resolve();
     } else {
