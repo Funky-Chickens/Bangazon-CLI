@@ -334,8 +334,9 @@ let orderMenuHandler = (err, userInput) => {
   }
 };
 
-let productMenuHandler = (err, userInput) => {
-  console.log("user input", userInput);
+let productMenuHandler = (userInput, prodObj) => {
+
+  console.log("user input product menu", userInput, prodObj);
   if(userInput.choice == '1') {
     let prodName = "product_name";
     productNamePrompt() //prompts user to enter a new product name
