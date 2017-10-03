@@ -15,7 +15,7 @@ module.exports.newProductPrompt = () => {
     {
       name: 'price',
       description: "Enter the product's Price",
-      type: 'integer',
+      type: 'number',
       required: true
     },
     {
