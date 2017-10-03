@@ -84,9 +84,8 @@ let printAllCustomers = () => {//main menu
   ${magenta('4.')} Add a product to sell
   ${magenta('5.')} Update product information
   ${magenta('6.')} Delete product
-  ${magenta('7.')} See product popularity
-  ${magenta('8.')} Return to the main menu
-  ${magenta('9.')} Leave Bangazon!`);
+  ${magenta('7.')} Return to the main menu
+  ${magenta('8.')} Leave Bangazon!`);
   prompt.get([{
     name: 'choice',
     description: 'Please make a selection',
@@ -104,7 +103,7 @@ let customerMenuHandler = (err, userInput) => {//handles main menu input
       //run post payment function and return to menu
     }).catch( (err) => {
       console.log("errormagherd", err);
-    }); 
+    });
 
   } else if (userInput.choice == '2') {
     addToCartStart()//add product to shopping cart
@@ -189,14 +188,8 @@ let customerMenuHandler = (err, userInput) => {//handles main menu input
       console.log("deletable products error", err);
     })
   } else if (userInput.choice == '7') {
-    productPopPrompt()
-    .then( (productPop) => {
-      console.log('the popularity for', productPop, 'is:');
-      //run function to get popularity of entered product
-    })
-  } else if (userInput.choice == '8') {
     module.exports.displayWelcome();
-  } else if (userInput.choice == '9') {
+  } else if (userInput.choice == '8') {
     console.log('Thank you for visiting Bangazon.  Goodbye.')
     prompt.stop();
   }
