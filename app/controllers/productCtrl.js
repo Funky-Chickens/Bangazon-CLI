@@ -60,24 +60,12 @@ module.exports.deleteFromSeller = (selection, prodObjs, userId) => {
     return new Promise( (resolve, reject) => {
         let prodIds = getProductIds(prodObjs)
         let productToDelete = productSelectMatch(prodIds, selection);
-        // console.log("get orders", getOrders(productToDelete));
         if(productToDelete) {
-            // console.log(getOrders(productToDelete));
-            getOrders(productToDelete)
-            .then( (result) => {
-              console.log("here", result);
-              console.log("or here", productToDelete);
-                if(result == false) {
-                    deleteProduct(productToDelete.productId)
-                    .then( (lastID) => {
-                        console.log("Product deleted");
-                        resolve();
-                    });
-                } else {
-                            console.log("this item cannot be deleted");
-                            resolve();
-                };
-            });
+          deleteProduct(productToDelete)
+          .then( (lastID) => {
+              console.log("Product deleted");
+              resolve();
+          });
         } else {
             console.log("Invalid Product");
             resolve();
@@ -101,13 +89,6 @@ let getProductIds = (prodObjs) => {
     return prodIds
 }
 
-// module.exports.selectProduct = (selection, prodObjs, userId) => {
-//   return new Promise( (resolve, reject) => {
-//     let productIds = getProductIds(prodObjs);
-//     let prodUpdate = productSelectMatch(prodObjs, selection);
-//     resolve(prodUpdate)
-//   })
-// }
 
 module.exports.deleteProdPrompt = () => {
   return new Promise( (resolve, reject) => {
@@ -130,18 +111,6 @@ module.exports.showAllProducts = (userId) => {
         resolve(prodObjs);
       });
   });
-}
-
-let getProductIds = (prodObjs) => {
-  let prodIds = prodObjs.map( (prod) => {
-      return prod.product_id;
-  });
-  return prodIds
-}
-
-let productSelectMatch = (prodIds, selection) => {
-  let productToUpdate = prodIds[selection -1];
-  if (productToUpdate) return productToUpdate
 }
 
 module.exports.selectProduct = (selection, prodObjs, userId) => {
@@ -182,7 +151,6 @@ module.exports.productNamePrompt = () => {
       required: true
     }], function(err, results) {
       if (err) return reject(err);
-      console.log("results product name prompt", results);
       resolve(results);
     })
   });

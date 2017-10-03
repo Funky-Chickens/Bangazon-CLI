@@ -171,7 +171,6 @@ let customerMenuHandler = (err, userInput) => {//handles main menu input
       //run function to update product information
   } else if (userInput.choice == '6') {//delete a seller product
     deletableProducts(Number(getActiveCustomer().id))
-<<<<<<< HEAD
     .then( (prodObj) => {
       if(prodObj.length === 0) {
         console.log("no products available to delete");
@@ -179,32 +178,14 @@ let customerMenuHandler = (err, userInput) => {//handles main menu input
       } else {
           displayDeletableProducts(prodObj);
           deleteProdPrompt()
-          .then( (data) => {
+          .then( (data) => { //data is number user selected
             deleteFromSeller(data.productId, prodObj, getActiveCustomer().id)
                .then( () => {
                   printAllCustomers();
-              })
-          })
+              });
+          });
       }
-
-    //   deleteProdPrompt()
-    //   .then( (productObj) => {
-    //     deleteProduct(productObj.productId)
-    //     .then( (result) => {
-    //      console.log('this product has been deleted'); 
-    //      printAllCustomers();
-    //     })
-    //     .catch((err) => {
-    //      console.log("delete product error", err)
-    //     })
-    //   //run function to get popularity of entered product
-    // })
-    })
-  // }
-    // .catch((err) => {
-    //   console.log("deletable products error", err);
-    // })
-    
+    });
   } else if (userInput.choice == '7') {
     module.exports.displayWelcome();
   } else if (userInput.choice == '8') {
