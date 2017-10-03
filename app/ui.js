@@ -317,9 +317,10 @@ let orderMenuHandler = (err, userInput) => {
       return PaymentAddToOrder(paymentIDtoAdd, uid)
     })
     .then( (result) => {
+      console.log("This order has been completed.");
       printAllCustomers()
     }); 
-  } else if (userInput.choice == 'N'){
+  } else if (userInput.choice == 'N') {
     activeCustomerPrompt()
     .then( (activeCustomer) => {
       console.log('this customer is now active:', activeCustomer)

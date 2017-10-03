@@ -25,8 +25,7 @@ let getUsersPaymentOptions = (id) => {
 };
 
 let addPaymentToOrder = (paymentId, id) => {
-    console.log("paymentID and buyer id?", paymentId, id);
-    return new Promise( (resolve, reject) => {
+   return new Promise( (resolve, reject) => {
         db.run(`UPDATE orders set payment_type = ${paymentId} where buyer_id = ${id} AND payment_type is NULL`, function (err) {
                 if (err) return reject(err);
                 resolve(this.lastID);
