@@ -106,5 +106,88 @@ module.exports.productUpdateMenu = (prodObj) => {
 })
 }
 
+module.exports.productNamePrompt = () => {
+  return new Promise( (resolve, reject) => {
+    prompt.get([{
+      name: 'productName',
+      description: "Enter the new product name",
+      type: 'string',
+      required: true
+    }], function(err, results) {
+      if (err) return reject(err);
+      console.log("results product name prompt", results);
+      resolve(results);
+    })
+  });
+};
+
+module.exports.productDescPrompt = () => {
+  return new Promise( (resolve, reject) => {
+    prompt.get([{
+      name: 'productDesc',
+      description: "Enter the new product description",
+      type: 'string',
+      required: true
+    }], function(err, results) {
+      if (err) return reject(err);
+      resolve(results);
+    })
+  });
+};
+
+module.exports.productPricePrompt = () => {
+  return new Promise( (resolve, reject) => {
+    prompt.get([{
+      name: 'productPrice',
+      description: "Enter the new product price",
+      type: 'string',
+      required: true
+    }], function(err, results) {
+      if (err) return reject(err);
+      resolve(results);
+    })
+  });
+};
+
+module.exports.productTypePrompt = () => {
+  return new Promise( (resolve, reject) => {
+    prompt.get([{
+      name: 'productType',
+      description: "Enter the new product type id",
+      type: 'number',
+      required: true
+    }], function(err, results) {
+      if (err) return reject(err);
+      resolve(results);
+    })
+  });
+};
+
+module.exports.productQtyPrompt = () => {
+  return new Promise( (resolve, reject) => {
+    prompt.get([{
+      name: 'productQty',
+      description: "Enter the new product quantity",
+      type: 'number',
+      required: true
+    }], function(err, results) {
+      if (err) return reject(err);
+      resolve(results);
+    })
+  });
+};
+
+module.exports.updateProductPrompt = () => {
+  return new Promise( (resolve, reject) => {
+    prompt.get([{
+      name: 'choice',
+      description: 'Please make a selection'
+    }], function(err, results){
+      if (err) return reject (err)
+        resolve(results);
+    })
+  })
+}
+
 module.exports.productUpdate= updateProduct; //use as intermediary between model and controller
 

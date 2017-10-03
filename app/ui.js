@@ -16,7 +16,7 @@ const { getActiveCustomer, setActiveCustomer } = require('./activeCustomer');
 const { promptNewCustomer } = require('./controllers/customerCtrl');
 const { addToCartStart, addToCart } = require('./controllers/orderCtrl');
 const { getPayment, selectPayment, getPaymentTypes, completeOrderWithPayment, completeOrderPrompt, calcOrderTotal, PaymentAddToOrder } = require('./controllers/paymentCtrl')
-const { newProductPrompt, deleteProdPrompt, showAllProducts, productUpdateMenu, selectProduct, productUpdate } = require('./controllers/productCtrl')
+const { newProductPrompt, deleteProdPrompt, showAllProducts, productUpdateMenu, selectProduct, productUpdate, productNamePrompt, productDescPrompt, productPricePrompt, productTypePrompt, productQtyPrompt, updateProductPrompt } = require('./controllers/productCtrl')
 const db = new Database(path.join(__dirname, '..', 'db', 'bangazon.sqlite'));
 
 let date = new Date;
@@ -61,10 +61,15 @@ let mainMenuHandler = (err, userInput) => {
     activeCustomerPrompt()
     .then( (activeCustomer) => {
       //get active customer and set active customer
-      setActiveCustomer(activeCustomer.customerId);
-      console.log(`Customer ${activeCustomer.customerId} is now active.`);
-      //run active customer function that opens the customerMenuHandler
-      printAllCustomers();
+      if (activeCustomer.customerId > numOfUsers) {
+        console.log("Please enter a valid selection.");
+        module.exports.displayWelcome();
+      } else {
+        setActiveCustomer(activeCustomer.customerId);
+        console.log(`Customer ${activeCustomer.customerId} is now active.`);
+        //run active customer function that opens the customerMenuHandler
+        printAllCustomers();
+      }
     });
   } else if (userInput.choice == '3') {
     console.log("Thank you for visiting Bangazon.  Goodbye.")
@@ -195,10 +200,13 @@ let customerMenuHandler = (err, userInput) => {//handles main menu input
   }
 };
 
+let numOfUsers = null;
+
 let activeCustomerPrompt = () => {
   return new Promise( (resolve, reject) => {
     getAllUsers()//GET list of all customer names and ids using customer js model
-    .then((allUsers)=>{
+    .then( (allUsers) => {
+      numOfUsers = allUsers.length;
       allUsers.forEach((user) => {
         console.log(`${user.user_id}: ${user.Name}`)
       });
@@ -332,7 +340,6 @@ let orderMenuHandler = (err, userInput) => {
 };
 
 let productMenuHandler = (userInput, prodObj) => {
-  console.log("user input product menu", userInput, prodObj);
   if(userInput.choice == '1') {
     let prodName = "product_name";
     productNamePrompt() //prompts user to enter a new product name
@@ -387,85 +394,3 @@ let productMenuHandler = (userInput, prodObj) => {
   }
 };
 
-let productNamePrompt = () => {
-  return new Promise( (resolve, reject) => {
-    prompt.get([{
-      name: 'productName',
-      description: "Enter the new product name",
-      type: 'string',
-      required: true
-    }], function(err, results) {
-      if (err) return reject(err);
-      console.log("results product name prompt", results);
-      resolve(results);
-    })
-  });
-};
-
-let productDescPrompt = () => {
-  return new Promise( (resolve, reject) => {
-    prompt.get([{
-      name: 'productDesc',
-      description: "Enter the new product description",
-      type: 'string',
-      required: true
-    }], function(err, results) {
-      if (err) return reject(err);
-      resolve(results);
-    })
-  });
-};
-
-let productPricePrompt = () => {
-  return new Promise( (resolve, reject) => {
-    prompt.get([{
-      name: 'productPrice',
-      description: "Enter the new product price",
-      type: 'string',
-      required: true
-    }], function(err, results) {
-      if (err) return reject(err);
-      resolve(results);
-    })
-  });
-};
-
-let productTypePrompt = () => {
-  return new Promise( (resolve, reject) => {
-    prompt.get([{
-      name: 'productType',
-      description: "Enter the new product type id",
-      type: 'number',
-      required: true
-    }], function(err, results) {
-      if (err) return reject(err);
-      resolve(results);
-    })
-  });
-};
-
-let productQtyPrompt = () => {
-  return new Promise( (resolve, reject) => {
-    prompt.get([{
-      name: 'productQty',
-      description: "Enter the new product quantity",
-      type: 'number',
-      required: true
-    }], function(err, results) {
-      if (err) return reject(err);
-      resolve(results);
-    })
-  });
-};
-
-let updateProductPrompt = () => {
-  return new Promise( (resolve, reject) => {
-    prompt.get([{
-      name: 'choice',
-      description: 'Please make a selection'
-    }], function(err, results){
-      if (err) return reject (err)
-        resolve(results);
-    })
-  })
-}
