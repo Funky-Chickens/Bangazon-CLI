@@ -307,8 +307,6 @@ let displayPayments = (paymentOpts) => {
 let orderMenuHandler = (err, userInput) => {
   let paymentOptions = null;
   let uid = Number(getActiveCustomer().id)
-  console.log("user input", userInput);
-  // This could get messy quickly. Maybe a better way to parse the input?
   if(userInput.choice.toUpperCase() == 'Y') {
     //Before we can launch complete order prompt, we need to display all the user's payment options
     getPaymentTypes(uid) 
