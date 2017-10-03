@@ -35,7 +35,9 @@ module.exports.displayWelcome = () => {//first menu
   ${magenta('3.')} Leave Bangazon!`);
     prompt.get([{
       name: 'choice',
-      description: 'Please make a selection'
+      description: 'Please make a selection',
+      type: 'integer',
+      required: true
     }], mainMenuHandler );
 };
 
@@ -87,7 +89,9 @@ let printAllCustomers = () => {//main menu
   ${magenta('9.')} Leave Bangazon!`);
   prompt.get([{
     name: 'choice',
-    description: 'Please make a selection'
+    description: 'Please make a selection',
+    type: 'integer',
+    required: true
   }], customerMenuHandler );
 }
 
@@ -208,7 +212,7 @@ let activeCustomerPrompt = () => {
         prompt.get([{
           name: 'customerId',
           description: "Enter the customer's Id",
-          type: 'string',
+          type: 'integer',
           required: true
         }], function(err, results) {
           if (err) return reject(err);
@@ -334,8 +338,8 @@ let orderMenuHandler = (err, userInput) => {
   }
 };
 
-let productMenuHandler = (err, userInput) => {
-  console.log("user input", userInput);
+let productMenuHandler = (userInput, prodObj) => {
+  console.log("user input product menu", userInput, prodObj);
   if(userInput.choice == '1') {
     let prodName = "product_name";
     productNamePrompt() //prompts user to enter a new product name
