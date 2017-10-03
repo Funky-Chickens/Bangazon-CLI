@@ -8,14 +8,15 @@ const path = require('path');
 const { Database } = require('sqlite3').verbose();
 prompt.message = colors.blue("Bangazon Corp");
 
-// app modules
-const { promptNewCustomer } = require('./controllers/customerCtrl');
+//requiring in models - TODO: refactor these out, run everything through controllers
 const { postUserObj, getAllUsers } = require('./models/Customer');
+const { getAllUserProducts, getAllProducts, postNewProduct, deletableProducts, deleteProduct, getSellerProduct } = require('./models/Product')
+// app modules
 const { getActiveCustomer, setActiveCustomer } = require('./activeCustomer');
+const { promptNewCustomer } = require('./controllers/customerCtrl');
 const { addToCartStart, addToCart } = require('./controllers/orderCtrl');
 const { getPayment, selectPayment, getPaymentTypes, completeOrderWithPayment, completeOrderPrompt, calcOrderTotal, PaymentAddToOrder } = require('./controllers/paymentCtrl')
 const { newProductPrompt, deleteProdPrompt, showAllProducts, productUpdateMenu, selectProduct, productUpdate } = require('./controllers/productCtrl')
-const { getAllUserProducts, getAllProducts, postNewProduct, deletableProducts, deleteProduct, getSellerProduct } = require('./models/Product')
 const db = new Database(path.join(__dirname, '..', 'db', 'bangazon.sqlite'));
 
 let date = new Date;
@@ -293,10 +294,15 @@ let displayPayments = (paymentOpts) => {
     ${headerDivider}
     ${magenta(`**  Your Payment Options  **`)}
     ${headerDivider}`);
-    paymentOpts.forEach( (paymentOpts, i) => {
-        console.log(`${magenta(`${i + 1}. `)}${paymentOpts.payment_option_name}`)
-    });
-    resolve();
+    if (paymentOpts.length > 0) {
+      paymentOpts.forEach( (paymentOpts, i) => {
+          console.log(`${magenta(`${i + 1}. `)}${paymentOpts.payment_option_name}`)
+      });
+      resolve();
+    } else {
+      console.log("You must add a payment option to proceed. Choose option 1.");
+      printAllCustomers();
+    }
   })
 }
 
@@ -305,9 +311,7 @@ let displayPayments = (paymentOpts) => {
 let orderMenuHandler = (err, userInput) => {
   let paymentOptions = null;
   let uid = Number(getActiveCustomer().id)
-  console.log("user input", userInput);
-  // This could get messy quickly. Maybe a better way to parse the input?
-  if(userInput.choice == 'Y') {
+  if(userInput.choice.toUpperCase() == 'Y') {
     //Before we can launch complete order prompt, we need to display all the user's payment options
     getPaymentTypes(uid) 
     .then( (paymentTypes) => {
@@ -327,12 +331,8 @@ let orderMenuHandler = (err, userInput) => {
       console.log("This order has been completed.");
       printAllCustomers()
     }); 
-  } else if (userInput.choice == 'N') {
-    activeCustomerPrompt()
-    .then( (activeCustomer) => {
-      console.log('This customer is now active:', activeCustomer)
-      //run active customer function that opens the customerMenuHandler
-    });
+  } else if (userInput.choice.toUpperCase() == 'N') {
+    printAllCustomers()
   } else if (userInput.choice == '3') {
     prompt.stop();
   }

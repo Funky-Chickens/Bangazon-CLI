@@ -164,7 +164,6 @@ function insertUserRows() {
             });
         }))
         .then( (arrayOfIds) => {
-            console.log("last IDs", arrayOfIds);
             resolve();
         })
         .catch( (err) => {
