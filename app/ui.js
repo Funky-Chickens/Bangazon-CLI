@@ -193,12 +193,6 @@ let customerMenuHandler = (err, userInput) => {//handles main menu input
     .catch((err) => {
       console.log("deletable products error", err);
     })
-  } else if (userInput.choice == '7') {
-    productPopPrompt()
-    .then( (productPop) => {
-      console.log('the popularity for', productPop, 'is:');
-      //run function to get popularity of entered product
-    })
   } else if (userInput.choice == '8') {
     module.exports.displayWelcome();
   } else if (userInput.choice == '9') {
@@ -347,7 +341,6 @@ let orderMenuHandler = (err, userInput) => {
 };
 
 let productMenuHandler = (userInput, prodObj) => {
-  console.log("user input product menu", userInput, prodObj);
   if(userInput.choice == '1') {
     let prodName = "product_name";
     productNamePrompt() //prompts user to enter a new product name
