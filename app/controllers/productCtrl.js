@@ -15,7 +15,7 @@ module.exports.newProductPrompt = () => {
     {
       name: 'price',
       description: "Enter the product's Price",
-      type: 'number',
+      type: 'integer',
       required: true
     },
     {
@@ -27,13 +27,13 @@ module.exports.newProductPrompt = () => {
     {
       name: 'product_type_id',
       description: "Enter the product type Id",
-      type: 'number',
+      type: 'integer',
       required: true
     },
     {
       name: 'quantity_avail',
       description: "Enter the quantity available",
-      type: 'number',
+      type: 'integer',
       required: true
     }], function(err, results) {
       if (err) return reject(err);
@@ -47,7 +47,7 @@ module.exports.deleteProdPrompt = () => {
     prompt.get([{
       name: 'productId',
       description: "Enter the product Id to be deleted",
-      type: 'number',
+      type: 'integer',
       required: true
     }], function(err, results) {
       if (err) return reject(err);
@@ -97,7 +97,7 @@ module.exports.productUpdateMenu = (prodObj) => {
     prompt.get([{
     name:'choice',
     description:'Select a number:',
-    type:'number',
+    type:'integer',
     required:true
   }], function(err, results){
     if (err) return reject(err);
@@ -154,7 +154,7 @@ module.exports.productTypePrompt = () => {
     prompt.get([{
       name: 'productType',
       description: "Enter the new product type id",
-      type: 'number',
+      type: 'integer',
       required: true
     }], function(err, results) {
       if (err) return reject(err);
@@ -168,7 +168,7 @@ module.exports.productQtyPrompt = () => {
     prompt.get([{
       name: 'productQty',
       description: "Enter the new product quantity",
-      type: 'number',
+      type: 'integer',
       required: true
     }], function(err, results) {
       if (err) return reject(err);

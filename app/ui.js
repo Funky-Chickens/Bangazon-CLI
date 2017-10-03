@@ -234,7 +234,7 @@ let activeCustomerPrompt = () => {
       {
         name: 'accountNum',
         description: "Enter the account number",
-        type: 'number',
+        type: 'integer',
         required: true
       }], function(err, results) {
         if (err) return reject(err);
@@ -260,7 +260,7 @@ let addToCartPrompt = () => {
     prompt.get([{
       name: 'Product',
       description: "Enter the product",
-      type: 'number',
+      type: 'integer',
       required: true
     }], function(err, results) {
       if (err) return reject(err);
