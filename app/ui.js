@@ -74,6 +74,9 @@ let mainMenuHandler = (err, userInput) => {
   } else if (userInput.choice == '3') {
     console.log("Thank you for visiting Bangazon.  Goodbye.")
     prompt.stop();
+  } else {
+    console.log("Please make a valid selection.");
+    module.exports.displayWelcome();
   }
 };
 
@@ -197,6 +200,9 @@ let customerMenuHandler = (err, userInput) => {//handles main menu input
   } else if (userInput.choice == '8') {
     console.log('Thank you for visiting Bangazon.  Goodbye.')
     prompt.stop();
+  } else {
+    console.log("Please make a valid selection.");
+    printAllCustomers();
   }
 };
 
