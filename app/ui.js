@@ -8,14 +8,15 @@ const path = require('path');
 const { Database } = require('sqlite3').verbose();
 prompt.message = colors.blue("Bangazon Corp");
 
-// app modules
-const { promptNewCustomer } = require('./controllers/customerCtrl');
+//requiring in models - TODO: refactor these out, run everything through controllers
 const { postUserObj, getAllUsers } = require('./models/Customer');
+const { getAllUserProducts, getAllProducts, postNewProduct, deletableProducts, deleteProduct, getSellerProduct } = require('./models/Product')
+// app modules
 const { getActiveCustomer, setActiveCustomer } = require('./activeCustomer');
+const { promptNewCustomer } = require('./controllers/customerCtrl');
 const { addToCartStart, addToCart } = require('./controllers/orderCtrl');
 const { getPayment, selectPayment, getPaymentTypes, completeOrderWithPayment, completeOrderPrompt, calcOrderTotal, PaymentAddToOrder } = require('./controllers/paymentCtrl')
 const { newProductPrompt, deleteProdPrompt, showAllProducts, productUpdateMenu, selectProduct, productUpdate } = require('./controllers/productCtrl')
-const { getAllUserProducts, getAllProducts, postNewProduct, deletableProducts, deleteProduct, getSellerProduct } = require('./models/Product')
 const db = new Database(path.join(__dirname, '..', 'db', 'bangazon.sqlite'));
 
 let date = new Date;
