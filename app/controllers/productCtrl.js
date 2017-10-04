@@ -15,7 +15,7 @@ module.exports.newProductPrompt = () => {
     {
       name: 'price',
       description: "Enter the product's Price",
-      type: 'number',
+      type: 'string',//string input we can transform
       required: true
     },
     {

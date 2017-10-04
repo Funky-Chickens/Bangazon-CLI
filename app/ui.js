@@ -136,17 +136,9 @@ let customerMenuHandler = (err, userInput) => {//handles main menu input
     newProductPrompt()
     .then( (newProduct) => {
       newProduct.seller_id = Number(getActiveCustomer().id);
-      const alphaVal = (s) => s.toLowerCase().charCodeAt(0) - 97 + 1;
-      if (newProduct.price === NaN) {
-        newProduct.price = alphaVal(newProduct.price);
-        console.log(newProduct.price);
+      if(/[0-9]/.test(newProduct.price) === false){//checks to see if entry is a number, if not, changes letters to number using character code
+        newProduct.price = newProduct.price.toLowerCase().charCodeAt(0) - 97 + 1
       }
-//WE NEED TO ASK ABOUT THIS STUFF -- we pass in a string and it breaks it if prompt is set to number isntead of integer
-      // console.log("type of?", typeof newProduct.price);
-      // if (typeof newProduct.price === 'string') {
-      //   newProduct.price = 1;
-      // }
-      // console.log("newProduct price", newProduct.price);
       postNewProduct(newProduct)
       .then ( (result) => {
         console.log("This new product was saved with the ID: ", result);
