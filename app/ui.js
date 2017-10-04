@@ -68,7 +68,7 @@ let mainMenuHandler = (err, userInput) => {
         setActiveCustomer(activeCustomer.customerId);
         console.log(`Customer ${activeCustomer.customerId} is now active.`);
         //run active customer function that opens the customerMenuHandler
-        printAllCustomers();
+        displayCustomerMenu();
       }
     });
   } else if (userInput.choice == '3') {
@@ -80,7 +80,7 @@ let mainMenuHandler = (err, userInput) => {
   }
 };
 
-let printAllCustomers = () => {//main menu
+let displayCustomerMenu = () => {//main menu
   let headerDivider = `${magenta('*********************************************************')}`
   console.log(`
   ${headerDivider}
@@ -107,7 +107,7 @@ let customerMenuHandler = (err, userInput) => {//handles main menu input
     getPayment(Number(getActiveCustomer().id))
     .then( (paymentData) => {
       console.log('payment type Added!');
-      printAllCustomers();
+      displayCustomerMenu();
       //run post payment function and return to menu
     }).catch( (err) => {
       console.log("errormagherd", err);
@@ -118,14 +118,14 @@ let customerMenuHandler = (err, userInput) => {//handles main menu input
     .then( (prodObjs) => {
       if(prodObjs.length === 0) {
         console.log("No Products Available")
-        printAllCustomers()
+        displayCustomerMenu()
       } else {
       displayProducts(prodObjs);
       addToCartPrompt()
       .then( (data) => {
         addToCart(data.Product, prodObjs, getActiveCustomer().id)
         .then( () => {
-          printAllCustomers()
+          displayCustomerMenu()
         });
       })
     }
@@ -142,7 +142,7 @@ let customerMenuHandler = (err, userInput) => {//handles main menu input
       postNewProduct(newProduct)
       .then ( (result) => {
         console.log("This new product was saved with the ID: ", result);
-        printAllCustomers();
+        displayCustomerMenu();
         //run function to post new product
       })
         .catch ( (err) => {
@@ -170,7 +170,7 @@ let customerMenuHandler = (err, userInput) => {//handles main menu input
         });
       });
     } else {
-        printAllCustomers();
+        displayCustomerMenu();
     }
   });
       //  console.log('these changes have been made to the product:', updatedProd);
@@ -180,14 +180,14 @@ let customerMenuHandler = (err, userInput) => {//handles main menu input
     .then( (prodObj) => {
       if(prodObj.length === 0) {
         console.log("no products available to delete");
-        printAllCustomers();
+        displayCustomerMenu();
       } else {
           displayDeletableProducts(prodObj);
           deleteProdPrompt()
           .then( (data) => { //data is number user selected
             deleteFromSeller(data.productId, prodObj, getActiveCustomer().id)
                .then( () => {
-                  printAllCustomers();
+                  displayCustomerMenu();
               });
           });
       }
@@ -199,7 +199,7 @@ let customerMenuHandler = (err, userInput) => {//handles main menu input
     prompt.stop();
   } else {
     console.log("Please make a valid selection.");
-    printAllCustomers();
+    displayCustomerMenu();
   }
 };
 
@@ -286,7 +286,7 @@ module.exports.displayOrder = () => {
       description: 'Please make a selection'
     }], orderMenuHandler );
   } else {
-    printAllCustomers();
+    displayCustomerMenu();
   }
   });
 };
@@ -305,7 +305,7 @@ let displayPayments = (paymentOpts) => {
       resolve();
     } else {
       console.log("You must add a payment option to proceed. Choose option 1.");
-      printAllCustomers();
+      displayCustomerMenu();
     }
   })
 }
@@ -333,15 +333,15 @@ let orderMenuHandler = (err, userInput) => {
     })
     .then( (result) => {
       console.log("This order has been completed.");
-      printAllCustomers()
+      displayCustomerMenu()
     }); 
   } else if (userInput.choice.toUpperCase() == 'N') {
-    printAllCustomers()
+    displayCustomerMenu()
   } else if (userInput.choice == '3') {
     prompt.stop();
   } else {
     console.log("Please enter valid input. Get it together.");
-    printAllCustomers();
+    displayCustomerMenu();
   }
 };
 
@@ -354,7 +354,7 @@ let productMenuHandler = (userInput, prodObj) => {
       productUpdate(prodName, newProdName.productName, prodObj.product_id, prodObj.seller_id)
       .then( ()=>{
         console.log('This product name has been updated:', newProdName.productName);
-        printAllCustomers();//return to main menu
+        displayCustomerMenu();//return to main menu
       })
     });
   } else if (userInput.choice == '2'){
@@ -364,7 +364,7 @@ let productMenuHandler = (userInput, prodObj) => {
       productUpdate(prodDesc, newProdDescription.productDesc, prodObj.product_id, prodObj.seller_id)
       .then( ()=>{
         console.log('This product description has been updated:', newProdDescription.productDesc);
-        printAllCustomers();
+        displayCustomerMenu();
       })
     });
   } else if (userInput.choice == '3'){
@@ -373,7 +373,7 @@ let productMenuHandler = (userInput, prodObj) => {
     .then( (newProductPrice) => {
       productUpdate(prodPrice, newProductPrice.productPrice, prodObj.product_id, prodObj.seller_id)
       console.log('This product price has been updated:', newProductPrice.productPrice)
-      printAllCustomers();
+      displayCustomerMenu();
       //run active customer function that opens the customerMenuHandler
     });
   } else if (userInput.choice == '4'){
@@ -382,7 +382,7 @@ let productMenuHandler = (userInput, prodObj) => {
     .then( (newProductType) => {
       productUpdate(prodType, newProductType.productType, prodObj.product_id, prodObj.seller_id)
       console.log('This product type has been updated:', newProductType.productType)
-      printAllCustomers();
+      displayCustomerMenu();
       //run active customer function that opens the customerMenuHandler
     });
   } else if (userInput.choice == '5'){
@@ -391,11 +391,11 @@ let productMenuHandler = (userInput, prodObj) => {
     .then( (newProductQty) => {
       productUpdate(prodQty, newProductQty.productQty, prodObj.product_id, prodObj.seller_id)
       console.log('This product quantity has been updated:', newProductQty.productQty)
-      printAllCustomers();
+      displayCustomerMenu();
       //run active customer function that opens the customerMenuHandler
     });
   } else if (userInput.choice == '6') {
-    printAllCustomers();
+    displayCustomerMenu();
     // prompt.stop();//need to return to previous menu here instead of kicking us out
   }
 };
