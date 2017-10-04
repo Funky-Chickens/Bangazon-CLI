@@ -74,6 +74,9 @@ let mainMenuHandler = (err, userInput) => {
   } else if (userInput.choice == '3') {
     console.log("Thank you for visiting Bangazon.  Goodbye.")
     prompt.stop();
+  } else {
+    console.log("Please make a valid selection.");
+    module.exports.displayWelcome();
   }
 };
 
@@ -133,6 +136,9 @@ let customerMenuHandler = (err, userInput) => {//handles main menu input
     newProductPrompt()
     .then( (newProduct) => {
       newProduct.seller_id = Number(getActiveCustomer().id);
+      if(/[0-9]/.test(newProduct.price) === false){//checks to see if entry is a number, if not, changes letters to number using character code
+        newProduct.price = newProduct.price.toLowerCase().charCodeAt(0) - 97 + 1
+      }
       postNewProduct(newProduct)
       .then ( (result) => {
         console.log("This new product was saved with the ID: ", result);
@@ -191,6 +197,9 @@ let customerMenuHandler = (err, userInput) => {//handles main menu input
   } else if (userInput.choice == '8') {
     console.log('Thank you for visiting Bangazon.  Goodbye.')
     prompt.stop();
+  } else {
+    console.log("Please make a valid selection.");
+    printAllCustomers();
   }
 };
 
@@ -228,7 +237,7 @@ let activeCustomerPrompt = () => {
       {
         name: 'accountNum',
         description: "Enter the account number",
-        type: 'number',
+        type: 'integer',
         required: true
       }], function(err, results) {
         if (err) return reject(err);
@@ -254,7 +263,7 @@ let addToCartPrompt = () => {
     prompt.get([{
       name: 'Product',
       description: "Enter the product",
-      type: 'number',
+      type: 'integer',
       required: true
     }], function(err, results) {
       if (err) return reject(err);
@@ -330,6 +339,9 @@ let orderMenuHandler = (err, userInput) => {
     printAllCustomers()
   } else if (userInput.choice == '3') {
     prompt.stop();
+  } else {
+    console.log("Please enter valid input. Get it together.");
+    printAllCustomers();
   }
 };
 

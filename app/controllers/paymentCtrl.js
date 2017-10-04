@@ -17,7 +17,7 @@ let createPaymentPrompt = () => {
       {
         name: 'account_number',
         description: "Enter the account number",
-        type: 'number',
+        type: 'integer',
         required: true
       }], function(err, results) {
         if (err) return reject(err);
@@ -62,7 +62,7 @@ let selectPayment = (selection, paymentObjs, userId) => {
       prompt.get([{
         name: 'paymentId',
         description: "Enter the payment selection",
-        type: 'number',
+        type: 'integer',
         required: true
       }], function(err, results) {
         if (err) return reject(err);
