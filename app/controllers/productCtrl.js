@@ -115,7 +115,6 @@ module.exports.productNamePrompt = () => {
       required: true
     }], function(err, results) {
       if (err) return reject(err);
-      console.log("results product name prompt", results);
       resolve(results);
     })
   });
