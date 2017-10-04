@@ -61,5 +61,19 @@ let getProductIds = (prodObjs) => {
     return prodIds
 }
 
+let addToCartPrompt = () => {
+  return new Promise( (resolve, reject) => {
+    prompt.get([{
+      name: 'Product',
+      description: "Enter the product",
+      type: 'integer',
+      required: true
+    }], function(err, results) {
+      if (err) return reject(err);
+      resolve(results);
+    })
+  });
+};
 
-module.exports = { addToCartStart, addToCart }
+
+module.exports = { addToCartStart, addToCart, addToCartPrompt }
