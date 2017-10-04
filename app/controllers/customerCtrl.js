@@ -1,6 +1,7 @@
   'use strict';
 
 const prompt = require('prompt');
+const { postUserObj, getAllUsers } = require('../models/Customer')
 
 //make sure the name of each property matches the object properties passed to the function using this data object
 module.exports.promptNewCustomer = () => {
@@ -51,3 +52,8 @@ module.exports.promptNewCustomer = () => {
     })
   });
 };
+
+
+module.exports.getUsersAll = getAllUsers;
+
+module.exports.newUserPost = postUserObj;

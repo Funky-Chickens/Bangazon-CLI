@@ -8,15 +8,12 @@ const path = require('path');
 const { Database } = require('sqlite3').verbose();
 prompt.message = colors.blue("Bangazon Corp");
 
-//requiring in models - TODO: refactor these out, run everything through controllers
-const { postUserObj, getAllUsers } = require('./models/Customer');
-const { getAllUserProducts, getAllProducts, postNewProduct, deletableProducts, deleteProduct, getSellerProduct } = require('./models/Product')
 // app modules
 const { getActiveCustomer, setActiveCustomer } = require('./activeCustomer');
-const { promptNewCustomer } = require('./controllers/customerCtrl');
-const { addToCartStart, addToCart } = require('./controllers/orderCtrl');
+const { promptNewCustomer, newUserPost, getUsersAll } = require('./controllers/customerCtrl');
+const { addToCartStart, addToCart, addToCartPrompt } = require('./controllers/orderCtrl');
 const { getPayment, selectPayment, getPaymentTypes, completeOrderWithPayment, completeOrderPrompt, calcOrderTotal, PaymentAddToOrder } = require('./controllers/paymentCtrl')
-const { newProductPrompt, deleteProdPrompt, displayDeletableProducts, deleteFromSeller, showAllProducts, productUpdateMenu, selectProduct, productUpdate, productNamePrompt, productDescPrompt, productPricePrompt, productTypePrompt, productQtyPrompt, updateProductPrompt } = require('./controllers/productCtrl')
+const { productsDeletable, newProdPost, newProductPrompt, deleteProdPrompt, displayDeletableProducts, deleteFromSeller, showAllProducts, productUpdateMenu, selectProduct, productUpdate, productNamePrompt, productDescPrompt, productPricePrompt, productTypePrompt, productQtyPrompt, updateProductPrompt } = require('./controllers/productCtrl')
 const db = new Database(path.join(__dirname, '..', 'db', 'bangazon.sqlite'));
 
 let date = new Date;
@@ -47,7 +44,7 @@ let mainMenuHandler = (err, userInput) => {
     .then( (custData) => {
       custData.start_date = date;
       //save customer to db - cr
-      postUserObj(custData) //in Customer.js
+      newUserPost(custData) //in Customer.js
       .then( (result) => {
         console.log("This new customer was saved with the ID: ", result);
         module.exports.displayWelcome();//back to first menu
@@ -139,7 +136,7 @@ let customerMenuHandler = (err, userInput) => {//handles main menu input
       if(/[0-9]/.test(newProduct.price) === false){//checks to see if entry is a number, if not, changes letters to number using character code
         newProduct.price = newProduct.price.toLowerCase().charCodeAt(0) - 97 + 1
       }
-      postNewProduct(newProduct)
+      newProdPost(newProduct)
       .then ( (result) => {
         console.log("This new product was saved with the ID: ", result);
         printAllCustomers();
@@ -176,7 +173,7 @@ let customerMenuHandler = (err, userInput) => {//handles main menu input
       //  console.log('these changes have been made to the product:', updatedProd);
       //run function to update product information
   } else if (userInput.choice == '6') {//delete a seller product
-    deletableProducts(Number(getActiveCustomer().id))
+    productsDeletable(Number(getActiveCustomer().id))
     .then( (prodObj) => {
       if(prodObj.length === 0) {
         console.log("no products available to delete");
@@ -207,7 +204,7 @@ let numOfUsers = null;
 
 let activeCustomerPrompt = () => {
   return new Promise( (resolve, reject) => {
-    getAllUsers()//GET list of all customer names and ids using customer js model
+    getUsersAll()//GET list of all customer names and ids using customer js model
     .then( (allUsers) => {
       numOfUsers = allUsers.length;
       allUsers.forEach((user) => {
@@ -222,28 +219,8 @@ let activeCustomerPrompt = () => {
           if (err) return reject(err);
           resolve(results);
         })
-      })
     })
-  };
-
-  let createPaymentPrompt = () => {
-    return new Promise( (resolve, reject) => {
-      prompt.get([{
-        name: 'paymentName',
-        description: "Enter the payment option name",
-        type: 'string',
-        required: true
-      },
-      {
-        name: 'accountNum',
-        description: "Enter the account number",
-        type: 'integer',
-        required: true
-      }], function(err, results) {
-        if (err) return reject(err);
-        resolve(results);
-      })
-  });
+  })
 };
 
 //DISPLAY PRODUCTS: takes any array of objects and displays them numberically (1, 2, 3...) -jmr
@@ -258,19 +235,6 @@ let displayProducts = (prodObjs) => {
   });
 }
 
-let addToCartPrompt = () => {
-  return new Promise( (resolve, reject) => {
-    prompt.get([{
-      name: 'Product',
-      description: "Enter the product",
-      type: 'integer',
-      required: true
-    }], function(err, results) {
-      if (err) return reject(err);
-      resolve(results);
-    })
-  });
-};
 
 //edited to call functions in correct order to get the calculated order total - el/cm
 module.exports.displayOrder = () => {

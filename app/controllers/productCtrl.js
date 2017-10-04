@@ -7,6 +7,9 @@ const { checkForOpenOrders, getOrders } = require('../models/Order')
 
 // const { getActiveCustomer } = require('../activeCustomer');
 
+module.exports.newProdPost = postNewProduct;
+module.exports.productsDeletable = deletableProducts;
+
 module.exports.newProductPrompt = () => {
   return new Promise( (resolve, reject) => {
     prompt.get([{

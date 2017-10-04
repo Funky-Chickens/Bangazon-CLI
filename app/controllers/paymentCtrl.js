@@ -99,4 +99,4 @@ let selectPayment = (selection, paymentObjs, userId) => {
   return total;
   }
 
-module.exports= { getPayment,completeOrderWithPayment, completeOrderPrompt, calcOrderTotal, getPaymentTypes, selectPayment, PaymentAddToOrder };
+module.exports= { getPayment, completeOrderWithPayment, completeOrderPrompt, calcOrderTotal, getPaymentTypes, selectPayment, PaymentAddToOrder };
