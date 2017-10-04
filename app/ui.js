@@ -361,6 +361,8 @@ let productMenuHandler = (userInput, prodObj) => {
   } else if (userInput.choice == '6') {
     printAllCustomers();
     // prompt.stop();//need to return to previous menu here instead of kicking us out
+  } else {
+    console.log("Please enter a valid input.");
+    printAllCustomers();
   }
 };
-
