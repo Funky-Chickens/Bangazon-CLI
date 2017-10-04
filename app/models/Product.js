@@ -20,8 +20,7 @@ let getAllUserProducts = (id) => {
             }
         });
     });
-};
-
+}
 
 let postNewProduct = (prodObj) => {
     return new Promise( (resolve, reject) => {
@@ -30,7 +29,7 @@ let postNewProduct = (prodObj) => {
                 resolve(this.lastID);
         });
     });
-};
+}
 
 let getAllProducts = () => {
     return new Promise( (resolve, reject) => {
@@ -84,8 +83,8 @@ let updateProduct = (tableString, value, product_Id, sellerId) => {//grabbed by 
         db.run(`UPDATE products set ${tableString} = "${value}" WHERE seller_id = ${sellerId}  AND product_id = ${product_Id}`, (err) => {
             if (err) return reject(err);
             resolve();
-        })
-    })
+        });
+    });
 }
 
 

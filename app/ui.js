@@ -16,7 +16,7 @@ const { getActiveCustomer, setActiveCustomer } = require('./activeCustomer');
 const { promptNewCustomer } = require('./controllers/customerCtrl');
 const { addToCartStart, addToCart } = require('./controllers/orderCtrl');
 const { getPayment, selectPayment, getPaymentTypes, completeOrderWithPayment, completeOrderPrompt, calcOrderTotal, PaymentAddToOrder } = require('./controllers/paymentCtrl')
-const { newProductPrompt, deleteProdPrompt, showAllProducts, productUpdateMenu, selectProduct, productUpdate, productNamePrompt, productDescPrompt, productPricePrompt, productTypePrompt, productQtyPrompt, updateProductPrompt } = require('./controllers/productCtrl')
+const { newProductPrompt, deleteProdPrompt, displayDeletableProducts, deleteFromSeller, showAllProducts, productUpdateMenu, selectProduct, productUpdate, productNamePrompt, productDescPrompt, productPricePrompt, productTypePrompt, productQtyPrompt, updateProductPrompt } = require('./controllers/productCtrl')
 const db = new Database(path.join(__dirname, '..', 'db', 'bangazon.sqlite'));
 
 let date = new Date;
@@ -171,27 +171,21 @@ let customerMenuHandler = (err, userInput) => {//handles main menu input
       //run function to update product information
   } else if (userInput.choice == '6') {//delete a seller product
     deletableProducts(Number(getActiveCustomer().id))
-    .then( (results) => {
-      results.forEach( (item) => {
-        console.log("Deletable products: ");
-        console.log(item.product_id, item.product_name);
-      })
-      deleteProdPrompt()
-      .then( (productObj) => {
-        deleteProduct(productObj.productId)
-        .then( (result) => {
-         console.log('This product has been deleted.');
-         printAllCustomers();
-        })
-        .catch((err) => {
-         console.log("delete product error", err)
-        })
-      //run function to get popularity of entered product
-    })
-    })
-    .catch((err) => {
-      console.log("deletable products error", err);
-    })
+    .then( (prodObj) => {
+      if(prodObj.length === 0) {
+        console.log("no products available to delete");
+        printAllCustomers();
+      } else {
+          displayDeletableProducts(prodObj);
+          deleteProdPrompt()
+          .then( (data) => { //data is number user selected
+            deleteFromSeller(data.productId, prodObj, getActiveCustomer().id)
+               .then( () => {
+                  printAllCustomers();
+              });
+          });
+      }
+    });
   } else if (userInput.choice == '7') {
     module.exports.displayWelcome();
   } else if (userInput.choice == '8') {

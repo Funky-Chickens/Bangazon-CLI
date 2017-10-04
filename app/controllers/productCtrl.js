@@ -1,7 +1,10 @@
 'use strict';
+
 const {red, magenta, blue} = require("chalk");
 const prompt = require('prompt');
 const { getAllUserProducts, getAllProducts, postNewProduct, deletableProducts, deleteProduct, getSellerProduct, updateProduct }= require('../models/Product');
+const { checkForOpenOrders, getOrders } = require('../models/Order')
+
 // const { getActiveCustomer } = require('../activeCustomer');
 
 module.exports.newProductPrompt = () => {
@@ -42,6 +45,51 @@ module.exports.newProductPrompt = () => {
   });
 };
 
+module.exports.displayDeletableProducts = (prodObjs) => {
+  let headerDivider = `${magenta('*********************************************************')}`
+  console.log(`
+  ${headerDivider}
+  ${magenta(`**  Bangazon Products  **`)}
+  ${headerDivider}`);
+  prodObjs.forEach( (prod, i) => {
+      console.log(`${magenta(`${i + 1}. `)}${prod.product_name}`)
+  });
+}
+
+module.exports.deleteFromSeller = (selection, prodObjs, userId) => {
+    return new Promise( (resolve, reject) => {
+        let prodIds = getProductIds(prodObjs)
+        let productToDelete = productSelectMatch(prodIds, selection);
+        if(productToDelete) {
+          deleteProduct(productToDelete)
+          .then( (lastID) => {
+              console.log("Product deleted");
+              resolve();
+          });
+        } else {
+            console.log("Invalid Product");
+            resolve();
+        }
+    });
+}
+
+//matches the user's selection to the appropriate product ID -jmr
+let productSelectMatch = (prodIds, selection) => {
+    let productToAdd = prodIds[selection -1];
+    if (productToAdd) return productToAdd
+}
+
+
+
+//take an array of product objects and pull out just an array of ID's -jmr
+let getProductIds = (prodObjs) => {
+    let prodIds = prodObjs.map( (prod) => {
+        return prod.product_id;
+    });
+    return prodIds
+}
+
+
 module.exports.deleteProdPrompt = () => {
   return new Promise( (resolve, reject) => {
     prompt.get([{
@@ -63,18 +111,6 @@ module.exports.showAllProducts = (userId) => {
         resolve(prodObjs);
       });
   });
-}
-
-let getProductIds = (prodObjs) => {
-  let prodIds = prodObjs.map( (prod) => {
-      return prod.product_id;
-  });
-  return prodIds
-}
-
-let productSelectMatch = (prodIds, selection) => {
-  let productToUpdate = prodIds[selection -1];
-  if (productToUpdate) return productToUpdate
 }
 
 module.exports.selectProduct = (selection, prodObjs, userId) => {
@@ -115,7 +151,6 @@ module.exports.productNamePrompt = () => {
       required: true
     }], function(err, results) {
       if (err) return reject(err);
-      console.log("results product name prompt", results);
       resolve(results);
     })
   });

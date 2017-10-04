@@ -6,8 +6,6 @@ const path = require('path');
 const dbPath = path.resolve(__dirname, '..','..', 'db','bangazon.sqlite');
 const db = new Database(dbPath);
 
-//if there is an open order, will resolve the ID of that order. If no order or if only closed orders, will return -0
-
 //for adding a product to an order, if no order open, start new order
 let checkForOpenOrders = (id) => {
     return new Promise ( (resolve, reject) => {
@@ -47,4 +45,13 @@ let postOrder = (order_date, buyer_id) => {
     });
 }
 
-module.exports = { checkForOpenOrders, postOrder, getOneOrder };
+let getOrders = (productId) => {
+    return new Promise( (resolve, reject) => {
+        db.get(`SELECT * FROM productOrders WHERE prod_id = ${productId}`, function(err, prodOrdArr) {
+            if(err) return reject(err);
+            resolve(prodOrdArr);
+        })
+    })
+}
+
+module.exports = { checkForOpenOrders, postOrder, getOneOrder, getOrders };
